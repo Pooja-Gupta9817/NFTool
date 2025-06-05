@@ -1,0 +1,23 @@
+# Ignore build and cache folders
+bin/
+obj/
+.vs/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Ignore Rider & JetBrains IDE folders
+.idea/
+
+# Ignore Visual Studio database files
+*.VC.db
+*.VC.opendb
+
+# Ignore temporary files
+*.log
+*.tmp
+
+# Ignore local configuration
+launchSettings.json
