@@ -18,6 +18,7 @@ namespace DesktopTool.App.Infrastructure
                 options.UseSqlServer(connectionString)); // This connects to Azure SQL
 
             services.AddScoped<Core.IUserRepository, Data.UserRepository>();
+            
 
             return services;
         }
