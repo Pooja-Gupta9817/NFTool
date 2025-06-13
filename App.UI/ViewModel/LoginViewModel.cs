@@ -1,4 +1,5 @@
 ﻿using App.UI.ViewModel;
+using DesktopTool.App.Core;
 using DesktopTool.App.UI.Helper;
 using System;
 using System.Collections.Generic;
@@ -22,10 +23,14 @@ namespace DesktopTool.App.UI.ViewModel
 
         public ICommand LoginCommand { get; }
 
-        public LoginViewModel()
+        private readonly IAuthService _authService;
+
+        public LoginViewModel(IAuthService authService)
         {
+            _authService = authService;
             LoginCommand = new RelayCommand(ExecuteLogin, CanExecuteLogin);
         }
+
 
         private void ExecuteLogin()
         {

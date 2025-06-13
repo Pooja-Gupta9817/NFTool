@@ -1,5 +1,8 @@
 ﻿using DesktopTool.App.Core;
 using DesktopTool.App.Data;
+using DesktopTool.App.Service;
+using DesktopTool.App.UI.View;
+using DesktopTool.App.UI.ViewModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -17,10 +20,20 @@ namespace DesktopTool.App.Infrastructure
             services.AddDbContext<Data.ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString)); // This connects to Azure SQL
 
-            services.AddScoped<Core.IUserRepository, Data.UserRepository>();
-            
+            services.AddScoped<IUserRepository, UserRepository>();
+
+            // Register ViewModels
+            services.AddSingleton<LoginViewModel>();
+
+            // Register Views
+            services.AddSingleton<LoginView>();
+
+            // ✅ Register AuthService
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
+
+
         }
     }
 
