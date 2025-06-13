@@ -1,4 +1,5 @@
-﻿using DesktopTool.App.UI.ViewModel;
+﻿
+using DesktopTool.App.UI.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,5 +29,9 @@ namespace DesktopTool.App.UI.View
             DataContext = VM;
         }
 
+        private void PasswordBox_PasswordChanged(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

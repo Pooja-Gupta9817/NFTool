@@ -1,19 +1,30 @@
 ﻿using DesktopTool.App.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using DesktopTool.App.Data;
+using DesktopTool.App.UI.Model;
+using Microsoft.EntityFrameworkCore;
 
-namespace DesktopTool.App.Service
+public class AuthService : IAuthService
 {
-    public class AuthService : IAuthService
+    private readonly ApplicationDbContext _db;
+
+    public AuthService(ApplicationDbContext db)
     {
-        public async Task<bool> LoginAsync(string username, string password)
-        {
-            // Replace this with actual Azure authentication logic
-            await Task.Delay(500);
-            return username == "admin" && password == "1234";
-        }
+        _db = db;
+    }
+
+    public async Task<bool> LoginAsync(string email, string password)
+    {
+        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+        return user != null;
+    }
+
+    public async Task<bool> RegisterAsync(string name, string email, string password)
+    {
+        var exists = await _db.Users.AnyAsync(u => u.Email == email);
+        if (exists) return false;
+
+        _db.Users.Add(new User { Name = name, Email = email, Password = password });
+        await _db.SaveChangesAsync();
+        return true;
     }
 }

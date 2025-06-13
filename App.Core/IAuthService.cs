@@ -8,6 +8,8 @@ namespace DesktopTool.App.Core
 {
     public interface IAuthService
     {
-        Task<bool> LoginAsync(string username, string password);
+        Task<bool> LoginAsync(string email, string password);
+        Task<bool> RegisterAsync(string name, string email, string password);
     }
+
 }
