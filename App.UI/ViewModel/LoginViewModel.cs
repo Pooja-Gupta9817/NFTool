@@ -47,6 +47,21 @@ namespace DesktopTool.App.UI.ViewModel
             }
         }
 
+        private bool _isTeacher = false;
+        public bool IsTeacher
+        {
+            get => _isTeacher;
+            set
+            {
+                _isTeacher = value;
+                OnPropertyChanged(nameof(IsTeacher));
+                OnPropertyChanged(nameof(IsStudent));
+            }
+        }
+
+        public bool IsStudent => !IsTeacher;
+
+
         public bool IsRegisterMode => !IsLoginMode;
 
         public string ActionButtonText => IsLoginMode ? "Login" : "Register";
@@ -57,15 +72,23 @@ namespace DesktopTool.App.UI.ViewModel
         {
             if (IsLoginMode)
             {
-                var result = await _authService.LoginAsync(Email, Password);
-                MessageBox.Show(result ? "Login successful!" : "Login failed.");
+                var success = await _authService.LoginAsync(Email, Password);
+                if (success)
+                    MessageBox.Show("Login Successful!");
+                else
+                    MessageBox.Show("Login Failed");
             }
             else
             {
-                var result = await _authService.RegisterAsync(Name, Email, Password);
-                MessageBox.Show(result ? "Registered successfully!" : "Registration failed.");
+                var role = IsTeacher ? "Teacher" : "Student";
+                var success = await _authService.RegisterAsync(Name, Email, Password, role);
+                if (success)
+                    MessageBox.Show("Registration Successful!");
+                else
+                    MessageBox.Show("User already exists");
             }
         }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged([CallerMemberName] string name = null)

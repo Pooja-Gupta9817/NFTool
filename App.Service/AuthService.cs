@@ -3,28 +3,47 @@ using DesktopTool.App.Data;
 using DesktopTool.App.UI.Model;
 using Microsoft.EntityFrameworkCore;
 
-public class AuthService : IAuthService
+
+namespace DesktopTool.App.Service 
 {
-    private readonly ApplicationDbContext _db;
-
-    public AuthService(ApplicationDbContext db)
+    public class AuthService : IAuthService
     {
-        _db = db;
-    }
+        private readonly ApplicationDbContext _context;
 
-    public async Task<bool> LoginAsync(string email, string password)
-    {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
-        return user != null;
-    }
+        public AuthService(ApplicationDbContext context)
+        {
+            _context = context;
+        }
 
-    public async Task<bool> RegisterAsync(string name, string email, string password)
-    {
-        var exists = await _db.Users.AnyAsync(u => u.Email == email);
-        if (exists) return false;
+        public async Task<bool> RegisterAsync(string name, string email, string password, string role)
+        {
+            if (_context.Users.Any(u => u.Email == email))
+                return false;
 
-        _db.Users.Add(new User { Name = name, Email = email, Password = password });
-        await _db.SaveChangesAsync();
-        return true;
+            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+            var user = new User
+            {
+                Name = name,
+                Email = email,
+                PasswordHash = hashedPassword,
+                Role = role
+            };
+
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<bool> LoginAsync(string email, string password)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+                return false;
+
+            return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+        }
     }
 }
+
+
