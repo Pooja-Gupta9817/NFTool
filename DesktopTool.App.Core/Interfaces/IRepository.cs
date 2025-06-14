@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DesktopTool.App.Core
+namespace DesktopTool.App.Core.Models
 {
     //This allows reusable data access for any entity class (like User, Product, etc.)
     public interface IRepository<T> where T : class

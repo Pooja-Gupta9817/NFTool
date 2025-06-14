@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DesktopTool.App.Core
+namespace DesktopTool.App.Core.Models
 {
     public interface IAuthService
     {

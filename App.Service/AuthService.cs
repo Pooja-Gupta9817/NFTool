@@ -1,7 +1,9 @@
 ﻿using DesktopTool.App.Core;
 using DesktopTool.App.Data;
-using DesktopTool.App.UI.Model;
+
 using Microsoft.EntityFrameworkCore;
+using DesktopTool.App.Core.Models;
+using DesktopTool.App.Infrastructure;
 
 
 namespace DesktopTool.App.Service 

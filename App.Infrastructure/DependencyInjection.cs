@@ -1,4 +1,5 @@
 ﻿using DesktopTool.App.Core;
+using DesktopTool.App.Core.Models;
 using DesktopTool.App.Data;
 using DesktopTool.App.Service;
 using DesktopTool.App.UI.View;
@@ -17,16 +18,18 @@ namespace DesktopTool.App.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
         {
-            services.AddDbContext<Data.ApplicationDbContext>(options =>
+            connectionString = "Server=localhost;Database=StudentToolDb;Trusted_Connection=True;TrustServerCertificate=True;";
+           
+            services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString)); // This connects to Azure SQL
 
             services.AddScoped<IUserRepository, UserRepository>();
 
             // Register ViewModels
-            services.AddSingleton<LoginViewModel>();
+            services.AddTransient<LoginViewModel>();
 
             // Register Views
-            services.AddSingleton<LoginView>();
+            services.AddTransient<LoginView>();
 
             // ✅ Register AuthService
             services.AddScoped<IAuthService, AuthService>();
