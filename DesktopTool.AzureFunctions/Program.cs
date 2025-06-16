@@ -7,18 +7,17 @@ var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
 
+var connectionString = "Server=localhost;Database=StudentToolDb;Trusted_Connection=True;TrustServerCertificate=True;";
 var host = new HostBuilder()
     .ConfigureFunctionsWorkerDefaults()
     .ConfigureServices(services =>
     {
-        // 👇 Same as your WPF app
-        services.AddInfrastructure("Server=localhost;Database=StudentToolDb;Trusted_Connection=True;TrustServerCertificate=True;");
+        services.AddInfrastructure(connectionString);
     })
     .Build();
 
-// Application Insights isn't enabled by default. See https://aka.ms/AAt8mw4.
-// builder.Services
-//     .AddApplicationInsightsTelemetryWorkerService()
-//     .ConfigureFunctionsApplicationInsights();
+host.Run();
+
+
 
 builder.Build().Run();
