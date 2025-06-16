@@ -39,35 +39,35 @@ namespace DesktopTool.App.UI.View
 
         
 
-        private readonly HttpClient _httpClient = new HttpClient();
-        private async void TestAzureFunction_ClickAsync(object sender, RoutedEventArgs e)
-        {
-            var user = new
-            {
-                Id = 1,
-                Name = "Test User",
-                Email = "test@example.com",
-                PasswordHash = "123456",
-                Role = "Student"
-            };
+       // private readonly HttpClient _httpClient = new HttpClient();
+        //private async void TestAzureFunction_ClickAsync(object sender, RoutedEventArgs e)
+        //{
+        //    var user = new
+        //    {
+        //        Id = 1,
+        //        Name = "Test User",
+        //        Email = "test@example.com",
+        //        PasswordHash = "123456",
+        //        Role = "Student"
+        //    };
 
-            var options = new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                WriteIndented = true
-            };
+        //    var options = new JsonSerializerOptions
+        //    {
+        //        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        //        WriteIndented = true
+        //    };
 
-            string json = System.Text.Json.JsonSerializer.Serialize(user, options);
+        //    string json = System.Text.Json.JsonSerializer.Serialize(user, options);
 
 
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
+        //    var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            using var client = new HttpClient();
-            var response = await client.PostAsync("http://localhost:7071/api/register", content);
+        //    using var client = new HttpClient();
+        //    var response = await client.PostAsync("http://localhost:7071/api/register", content);
 
-            string result = await response.Content.ReadAsStringAsync();
-            MessageBox.Show($"Status: {(int)response.StatusCode}\nResult: {result}");
-        }
+        //    string result = await response.Content.ReadAsStringAsync();
+        //    MessageBox.Show($"Status: {(int)response.StatusCode}\nResult: {result}");
+        //}
 
     }
     }

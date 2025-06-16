@@ -47,8 +47,8 @@
 
             </StackPanel>
 <!--Testing-->
-            <Button Content="Test Azure Function" Click="TestAzureFunction_ClickAsync" Width="200" Height="30" />
-            <TextBlock Name="ResultText" TextWrapping="Wrap" Margin="10" />
+            <!--<Button Content="Test Azure Function" Click="TestAzureFunction_ClickAsync" Width="200" Height="30" />
+            <TextBlock Name="ResultText" TextWrapping="Wrap" Margin="10" />-->
 
             <Button Content="{Binding ActionButtonText}" Command="{Binding SubmitCommand}" Margin="0,20,0,0"/>
         </StackPanel>

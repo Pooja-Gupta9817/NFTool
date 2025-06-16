@@ -1,9 +1,10 @@
 ﻿using DesktopTool.App.Core;
-using DesktopTool.App.Data;
-
-using Microsoft.EntityFrameworkCore;
 using DesktopTool.App.Core.Models;
+using DesktopTool.App.Data;
 using DesktopTool.App.Infrastructure;
+using Microsoft.EntityFrameworkCore;
+using System.Net.Http;
+using System.Net.Http.Json;
 
 
 namespace DesktopTool.App.Service 
@@ -11,6 +12,8 @@ namespace DesktopTool.App.Service
     public class AuthService : IAuthService
     {
         private readonly ApplicationDbContext _context;
+        private readonly HttpClient _httpClient;
+        private readonly string _baseUrl = "http://localhost:7071/api/register";
 
         public AuthService(ApplicationDbContext context)
         {
@@ -24,26 +27,35 @@ namespace DesktopTool.App.Service
 
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
-            var user = new User
+            var user = new
             {
                 Name = name,
                 Email = email,
-                PasswordHash = hashedPassword,
+                Password = password,
                 Role = role
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return true;
+            var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/register", user);
+            return response.IsSuccessStatusCode;
+            
         }
 
         public async Task<bool> LoginAsync(string email, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null)
-                return false;
+            //var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            //if (user == null)
+            //    return false;
 
-            return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            var user = new
+            {
+                Email = email,
+                Password = password
+            };
+
+            var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/login", user);
+            return response.IsSuccessStatusCode;
+
+            //return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
         }
     }
 }

@@ -1,6 +1,9 @@
-﻿using Microsoft.Azure.Functions.Worker.Builder;
-using Microsoft.Extensions.Hosting;
+﻿using DesktopTool.App.Core.Models;
+using DesktopTool.App.Infrastructure;
 using DesktopTool.App.Infrastructure.Service;
+using Microsoft.Azure.Functions.Worker.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 
 var builder = FunctionsApplication.CreateBuilder(args);
@@ -13,6 +16,7 @@ var host = new HostBuilder()
     .ConfigureServices(services =>
     {
         services.AddInfrastructure(connectionString);
+        services.AddScoped<IUserRepository, UserRepository>();
     })
     .Build();
 
