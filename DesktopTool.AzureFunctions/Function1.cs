@@ -1,4 +1,5 @@
 using BCrypt.Net;
+using DesktopTool.App.Core;
 using DesktopTool.App.Core.Models;
 using DesktopTool.App.Infrastructure;
 using Microsoft.AspNetCore.Http;
@@ -26,12 +27,24 @@ namespace DesktopTool.AzureFunctions
         }
         [Function("RegisterUser")]
         public async Task<HttpResponseData> Run(
-                [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "register")] HttpRequestData req)
+               
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "register")] HttpRequestData req)
         {
+
+            RegisterUserDto? data = null;
             try
             {
+
                 var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                var data = JsonSerializer.Deserialize<User>(requestBody);
+                _logger.LogInformation("Reading request body...");
+                _logger.LogInformation($"Request Body Length: {requestBody?.Length}");
+
+                data = JsonSerializer.Deserialize<RegisterUserDto>(requestBody, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                _logger.LogInformation("Request body: " + requestBody);
 
                 if (data == null || string.IsNullOrWhiteSpace(data.Email))
                 {
@@ -48,20 +61,29 @@ namespace DesktopTool.AzureFunctions
                     return conflictResponse;
                 }
 
-                // Hash password before saving
-                data.PasswordHash = BCrypt.Net.BCrypt.HashPassword(data.PasswordHash);
+                // Create actual User entity
+                var newUser = new User
+                {
+                    Name = data.Name,
+                    Email = data.Email,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(data.Password),
+                    Role = data.Role
+                };
 
-                await _userRepository.SaveChangesAsync(data);
-                await _dbContext.SaveChangesAsync();
+                await _userRepository.AddAsync(newUser);
+                await _userRepository.SaveChangesAsync();
 
                 var successResponse = req.CreateResponse(HttpStatusCode.OK);
                 await successResponse.WriteStringAsync("User registered successfully");
                 return successResponse;
+
             }
             catch (Exception ex)
             {
-                var errorResponse = req.CreateResponse(HttpStatusCode.InternalServerError);
-                await errorResponse.WriteStringAsync("Error: " + ex.Message);
+
+                _logger.LogError(ex, "Deserialization failed.");
+                var errorResponse = req.CreateResponse(HttpStatusCode.BadRequest);
+                await errorResponse.WriteStringAsync("Invalid JSON format: " + ex.Message);
                 return errorResponse;
             }
         }

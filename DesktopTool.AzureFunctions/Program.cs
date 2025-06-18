@@ -24,4 +24,3 @@ host.Run();
 
 
 
-builder.Build().Run();

@@ -5,6 +5,7 @@ using DesktopTool.App.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Windows;
 
 
 namespace DesktopTool.App.Service 
@@ -13,21 +14,23 @@ namespace DesktopTool.App.Service
     {
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "http://localhost:7071/api/register";
+        private readonly string _baseUrl = "http://localhost:7071";
 
-        public AuthService(ApplicationDbContext context)
+
+        public AuthService(ApplicationDbContext context , HttpClient httpClient)
         {
             _context = context;
+            _httpClient = httpClient;
         }
 
         public async Task<bool> RegisterAsync(string name, string email, string password, string role)
         {
+            Console.WriteLine("Sending request to Azure Function");
+
             if (_context.Users.Any(u => u.Email == email))
                 return false;
 
-            var hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
-
-            var user = new
+            var user = new RegisterUserDto
             {
                 Name = name,
                 Email = email,
@@ -35,10 +38,13 @@ namespace DesktopTool.App.Service
                 Role = role
             };
 
-            var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/register", user);
+            var response = await _httpClient.PostAsJsonAsync("/api/register", user);
+            var result = await response.Content.ReadAsStringAsync();
+
+            MessageBox.Show(result);
             return response.IsSuccessStatusCode;
-            
         }
+
 
         public async Task<bool> LoginAsync(string email, string password)
         {

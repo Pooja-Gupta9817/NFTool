@@ -11,9 +11,13 @@ namespace DesktopTool.App.Core.Models
     {
         Task<IEnumerable<T>> GetAllAsync();
         Task<T> GetByIdAsync(int id);
-        Task SaveChangesAsync(T entity);
+
+        Task AddAsync(T entity);            // ✅ new: just adds to context
+        Task SaveChangesAsync();            // ✅ new: commits to DB
+
         void Update(T entity);
         void Delete(T entity);
     }
+
 
 }

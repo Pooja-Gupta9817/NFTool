@@ -32,7 +32,13 @@ namespace DesktopTool.App.Infrastructure
             services.AddTransient<LoginView>();
 
             // ✅ Register AuthService
-            services.AddScoped<IAuthService, AuthService>();
+           // services.AddHttpClient<IAuthService, AuthService>();
+
+            services.AddHttpClient<IAuthService, AuthService>(client =>
+            {
+                client.BaseAddress = new Uri("http://localhost:7071");
+            });
+
 
             return services;
 
