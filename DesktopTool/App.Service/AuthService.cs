@@ -5,7 +5,10 @@ using DesktopTool.App.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Text;
+using System.Text.Json;
 using System.Windows;
+
 
 
 namespace DesktopTool.App.Service 
@@ -14,7 +17,7 @@ namespace DesktopTool.App.Service
     {
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _httpClient;
-        private readonly string _baseUrl = "http://localhost:7071";
+       // private readonly string _baseUrl = "http://localhost:7071";
 
 
         public AuthService(ApplicationDbContext context , HttpClient httpClient)
@@ -38,10 +41,18 @@ namespace DesktopTool.App.Service
                 Role = role
             };
 
-            var response = await _httpClient.PostAsJsonAsync("/api/register", user);
+            var json = JsonSerializer.Serialize(user);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            Console.WriteLine("Sending JSON: " + json); 
+
+            var response = await _httpClient.PostAsync("/api/register", content);
+
+
             var result = await response.Content.ReadAsStringAsync();
 
-            MessageBox.Show(result);
+            //string json = JsonSerializer.Serialize(user);
+            //MessageBox.Show(json);
             return response.IsSuccessStatusCode;
         }
 
@@ -58,7 +69,7 @@ namespace DesktopTool.App.Service
                 Password = password
             };
 
-            var response = await _httpClient.PostAsJsonAsync($"{_baseUrl}/login", user);
+            var response = await _httpClient.PostAsJsonAsync("/api/register", user);
             return response.IsSuccessStatusCode;
 
             //return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
