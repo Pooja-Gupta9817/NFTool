@@ -43,7 +43,8 @@ namespace DesktopTool.App.UI.ViewModel
                 {
                     _isLoginMode = value;
                     OnPropertyChanged(nameof(IsLoginMode));
-                    OnPropertyChanged(nameof(IsRegisterMode)); // Update UI bound to this too
+                    OnPropertyChanged(nameof(IsRegisterMode));
+                    OnPropertyChanged(nameof(ActionButtonText)); 
                 }
             }
         }

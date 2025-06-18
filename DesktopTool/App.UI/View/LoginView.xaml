@@ -9,48 +9,61 @@
         <local:InverseBoolConverter x:Key="InverseBoolConverter" />
     </Window.Resources>
 
-    <Grid Margin="20">
-        <StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
-                <RadioButton Content="Login"
+    <Grid Margin="40">
+        <Border Background="#FFF" CornerRadius="10" Padding="20" BorderBrush="#DDD" BorderThickness="1" >
+            <StackPanel>
+
+                <TextBlock Text="Welcome" FontSize="20" FontWeight="Bold" Margin="0,0,0,20" />
+
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
+                    <RadioButton Content="Login"
                              GroupName="Mode"
                              IsChecked="{Binding IsLoginMode}" />
 
-                <RadioButton Content="Register"
+                    <RadioButton Content="Register"
                              GroupName="Mode"
                              IsChecked="{Binding IsLoginMode, Converter={StaticResource InverseBoolConverter}}"
                              Margin="20,0,0,0" />
-            </StackPanel>
+                </StackPanel>
 
-            <TextBlock Text="Name" />
-            <TextBox Text="{Binding Name}" />
-
-            <TextBlock Text="Email" Margin="0,10,0,0"
+                <!-- Name field (Register mode only) -->
+                <TextBlock Text="Name"
                        Visibility="{Binding IsRegisterMode, Converter={StaticResource BoolToVisibilityConverter}}" />
-            <TextBox Text="{Binding Email}"
+                <TextBox Text="{Binding Name}" 
                      Visibility="{Binding IsRegisterMode, Converter={StaticResource BoolToVisibilityConverter}}" />
 
-            <TextBlock Text="Password" Margin="0,10,0,0"/>
-            <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" />
+                <TextBlock Text="Email" Margin="0,10,0,0" />
+                <TextBox Text="{Binding Email}" />
 
-            <StackPanel Orientation="Horizontal"
-            Margin="0,10,0,10"
-            Visibility="{Binding IsRegisterMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <TextBlock Text="Password" Margin="0,10,0,0"/>
+                <PasswordBox x:Name="PasswordBox" PasswordChanged="PasswordBox_PasswordChanged" />
 
-                <RadioButton Content="Student"
-             GroupName="Role"
-             IsChecked="{Binding IsTeacher, Converter={StaticResource InverseBoolConverter}}" />
-
+                <!-- Role Selection (Register mode only) -->
+                <StackPanel Orientation="Horizontal"
+                        Margin="0,10,0,0"
+                        Visibility="{Binding IsRegisterMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <TextBlock Text="Role:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                    <RadioButton Content="Student"
+                             GroupName="Role"
+                             IsChecked="{Binding IsTeacher, Converter={StaticResource InverseBoolConverter}}" />
                     <RadioButton Content="Teacher"
-             GroupName="Role"
-             IsChecked="{Binding IsTeacher}" />
+                             GroupName="Role"
+                             IsChecked="{Binding IsTeacher}"
+                             Margin="10,0,0,0"/>
+                </StackPanel>
+
+                <Button Content="{Binding ActionButtonText}"
+                    Command="{Binding SubmitCommand}"
+                    Margin="0,20,0,0"
+                    Height="40"
+                    Background="#007ACC"
+                    Foreground="White"
+                    FontWeight="Bold"
+                    BorderBrush="Transparent"
+                    Cursor="Hand"/>
 
             </StackPanel>
-<!--Testing-->
-            <!--<Button Content="Test Azure Function" Click="TestAzureFunction_ClickAsync" Width="200" Height="30" />
-            <TextBlock Name="ResultText" TextWrapping="Wrap" Margin="10" />-->
-
-            <Button Content="{Binding ActionButtonText}" Command="{Binding SubmitCommand}" Margin="0,20,0,0"/>
-        </StackPanel>
+        </Border>
     </Grid>
+
 </Window>
