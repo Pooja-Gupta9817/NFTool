@@ -3,6 +3,7 @@ using DesktopTool.App.Core.Models;
 using DesktopTool.App.Data;
 using DesktopTool.App.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -17,13 +18,18 @@ namespace DesktopTool.App.Service
     {
         private readonly ApplicationDbContext _context;
         private readonly HttpClient _httpClient;
-       // private readonly string _baseUrl = "http://localhost:7071";
+        // private readonly string _baseUrl = "http://localhost:7071";
+        private string _jwtToken;
 
+        public string JwtToken => _jwtToken;
 
         public AuthService(ApplicationDbContext context , HttpClient httpClient)
         {
             _context = context;
             _httpClient = httpClient;
+            _httpClient.DefaultRequestHeaders.Authorization =
+                                            new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenStorage.GetToken());
+
         }
 
         public async Task<bool> RegisterAsync(string name, string email, string password, string role)
@@ -44,7 +50,7 @@ namespace DesktopTool.App.Service
             var json = JsonSerializer.Serialize(user);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            Console.WriteLine("Sending JSON: " + json); 
+            Console.WriteLine("Sending Registration JSON: " + json); 
 
             var response = await _httpClient.PostAsync("/api/register", content);
 
@@ -59,21 +65,31 @@ namespace DesktopTool.App.Service
 
         public async Task<bool> LoginAsync(string email, string password)
         {
-            //var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            //if (user == null)
-            //    return false;
-
-            var user = new
+            var user = new LoginUserDto
             {
                 Email = email,
-                Password = password
+                Password = password,
             };
 
-            var response = await _httpClient.PostAsJsonAsync("/api/register", user);
-            return response.IsSuccessStatusCode;
+            var json = JsonSerializer.Serialize(user);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            //return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash);
+            var response = await _httpClient.PostAsync("/api/login", content);
+
+            if (!response.IsSuccessStatusCode)
+                return false;
+
+            var responseJson = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<JwtResponse>(responseJson);
+            _jwtToken = result?.Token;
+            return true;
         }
+
+    }
+
+    public class JwtResponse
+    {
+        public string Token { get; set; }
     }
 }
 

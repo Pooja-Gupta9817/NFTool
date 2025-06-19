@@ -11,18 +11,16 @@ using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Text.Json;
 
-namespace DesktopTool.AzureFunctions
+namespace DesktopTool.AzureFunctions.Functions
 {
     public class RegisterUserFunction
     {
         private readonly IUserRepository _userRepository;
-        private readonly ApplicationDbContext _dbContext;
         private readonly ILogger _logger;
 
-        public RegisterUserFunction(IUserRepository userRepository, ApplicationDbContext dbContext, ILogger<RegisterUserFunction> logger)
+        public RegisterUserFunction(IUserRepository userRepository, ILogger<RegisterUserFunction> logger)
         {
             _userRepository = userRepository;
-            _dbContext = dbContext;
             _logger = logger;
         }
         [Function("RegisterUser")]
@@ -45,12 +43,14 @@ namespace DesktopTool.AzureFunctions
                 });
 
                 // Validate
-                if (string.IsNullOrWhiteSpace(data.Name) ||
+                if (string.IsNullOrWhiteSpace(data.Name) || data==null ||
                     string.IsNullOrWhiteSpace(data.Email) ||
                     string.IsNullOrWhiteSpace(data.Password) ||
                     string.IsNullOrWhiteSpace(data.Role))
                 {
-                    //return new BadRequestObjectResult("All fields are required.");
+                    var badRequest = req.CreateResponse(HttpStatusCode.BadRequest);
+                    await badRequest.WriteStringAsync("All fields (Name, Email, Password, Role) are required.");
+                    return badRequest;
                 }
                 _logger.LogInformation("Request body: " + requestBody);
 
