@@ -67,27 +67,66 @@ namespace DesktopTool.App.UI.ViewModel
         public bool IsRegisterMode => !IsLoginMode;
 
         public string ActionButtonText => IsLoginMode ? "Login" : "Register";
+        private string _errorMessage;
+        public string ErrorMessage
+        {
+            get => _errorMessage;
+            set { _errorMessage = value; OnPropertyChanged(); }
+        }
 
         public ICommand SubmitCommand { get; }
 
         private async Task SubmitAsync()
         {
+            ErrorMessage = string.Empty; 
+
             if (IsLoginMode)
             {
+                if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+                {
+                    ErrorMessage = "Email and Password are required.";
+                    return;
+                }
+
+                if (!IsValidEmail(Email))
+                {
+                    ErrorMessage = "Invalid email format.";
+                    return;
+                }
+
                 var success = await _authService.LoginAsync(Email, Password);
-                if (success)
-                    MessageBox.Show("Login Successful!");
-                else
-                    MessageBox.Show("Login Failed");
+                ErrorMessage = success ? "Login Successful!" : "Login Failed";
             }
             else
             {
+                if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+                {
+                    ErrorMessage = "All fields are required.";
+                    return;
+                }
+
+                if (!IsValidEmail(Email))
+                {
+                    ErrorMessage = "Invalid email format.";
+                    return;
+                }
+
                 var role = IsTeacher ? "Teacher" : "Student";
                 var success = await _authService.RegisterAsync(Name, Email, Password, role);
-                if (success)
-                    MessageBox.Show("Registration Successful!");
-                else
-                    MessageBox.Show("User already exists");
+                ErrorMessage = success ? "Registration Successful!" : "User already exists";
+            }
+        }
+
+        private bool IsValidEmail(string email)
+        {
+            try
+            {
+                var addr = new System.Net.Mail.MailAddress(email);
+                return addr.Address == email;
+            }
+            catch
+            {
+                return false;
             }
         }
 

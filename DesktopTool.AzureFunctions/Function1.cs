@@ -44,6 +44,14 @@ namespace DesktopTool.AzureFunctions
                     PropertyNameCaseInsensitive = true
                 });
 
+                // Validate
+                if (string.IsNullOrWhiteSpace(data.Name) ||
+                    string.IsNullOrWhiteSpace(data.Email) ||
+                    string.IsNullOrWhiteSpace(data.Password) ||
+                    string.IsNullOrWhiteSpace(data.Role))
+                {
+                    //return new BadRequestObjectResult("All fields are required.");
+                }
                 _logger.LogInformation("Request body: " + requestBody);
 
                 if (data == null || string.IsNullOrWhiteSpace(data.Email))
