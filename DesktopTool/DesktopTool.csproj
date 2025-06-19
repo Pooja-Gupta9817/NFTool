@@ -24,11 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="App.UI\View\" />
-    <Folder Include="App.UI\ViewModel\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\DesktopTool.App.Core\DesktopTool.App.Core.csproj" />
     <ProjectReference Include="..\DesktopTool.App.Infrastructure\DesktopTool.App.Infrastructure.csproj" />
   </ItemGroup>

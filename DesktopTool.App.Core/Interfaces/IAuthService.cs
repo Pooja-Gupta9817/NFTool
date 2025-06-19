@@ -9,7 +9,8 @@ namespace DesktopTool.App.Core.Models
     public interface IAuthService
     {
         Task<bool> RegisterAsync(string name, string email, string password, string role);
-        Task<bool> LoginAsync(string name, string password);
+        Task<(bool Success, string Role)> LoginAsync(string email, string password);
+
     }
 
 }

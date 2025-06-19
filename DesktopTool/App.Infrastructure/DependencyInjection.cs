@@ -1,4 +1,5 @@
 ﻿using DesktopTool.App.Core;
+using DesktopTool.App.Core.Interfaces;
 using DesktopTool.App.Core.Models;
 using DesktopTool.App.Data;
 using DesktopTool.App.Service;
@@ -27,11 +28,13 @@ namespace DesktopTool.App.Infrastructure
 
             // Register ViewModels
             services.AddTransient<LoginViewModel>();
+            services.AddTransient<StudentViewModel>();
+            services.AddTransient<TeacherViewModel>();
 
             // Register Views
             services.AddTransient<LoginView>();
 
-            // ✅ Register AuthService
+            //  Register AuthService
            // services.AddHttpClient<IAuthService, AuthService>();
 
             services.AddHttpClient<IAuthService, AuthService>(client =>
@@ -39,7 +42,11 @@ namespace DesktopTool.App.Infrastructure
                 client.BaseAddress = new Uri("http://localhost:7071");
             });
 
+            services.AddSingleton<TeacherView>();
+            services.AddSingleton<StudentView>();
+            services.AddSingleton<MainWindow>();
 
+            services.AddSingleton<IRoleBasedDashboardService, RoleBasedDashboardService>();
             return services;
 
 

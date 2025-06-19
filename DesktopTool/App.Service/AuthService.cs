@@ -4,6 +4,7 @@ using DesktopTool.App.Data;
 using DesktopTool.App.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
@@ -63,7 +64,7 @@ namespace DesktopTool.App.Service
         }
 
 
-        public async Task<bool> LoginAsync(string email, string password)
+        public async Task<(bool Success, string Role)> LoginAsync(string email, string password)
         {
             var user = new LoginUserDto
             {
@@ -75,21 +76,29 @@ namespace DesktopTool.App.Service
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync("/api/login", content);
-
             if (!response.IsSuccessStatusCode)
-                return false;
+                return (false, null);
 
             var responseJson = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<JwtResponse>(responseJson);
-            _jwtToken = result?.Token;
-            return true;
+            _jwtToken = result?.token;
+
+            if (string.IsNullOrWhiteSpace(_jwtToken))
+                return (false, null);
+
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(_jwtToken);
+            var roleClaim = token.Claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
+
+            return (true, roleClaim);
         }
+
 
     }
 
     public class JwtResponse
     {
-        public string Token { get; set; }
+        public string token { get; set; }
     }
 }
 

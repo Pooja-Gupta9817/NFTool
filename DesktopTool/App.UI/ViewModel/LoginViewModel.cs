@@ -1,5 +1,6 @@
 ﻿using App.UI.ViewModel;
 using DesktopTool.App.Core;
+using DesktopTool.App.Core.Interfaces;
 using DesktopTool.App.Core.Models;
 using DesktopTool.App.UI.Helper;
 using System;
@@ -17,10 +18,11 @@ namespace DesktopTool.App.UI.ViewModel
     public class LoginViewModel : INotifyPropertyChanged
     {
         private readonly IAuthService _authService;
-
-        public LoginViewModel(IAuthService authService)
+        private readonly IRoleBasedDashboardService _roleWindowService;
+        public LoginViewModel(IAuthService authService, IRoleBasedDashboardService roleWindowService)
         {
             _authService = authService;
+            _roleWindowService= roleWindowService;
             SubmitCommand = new RelayCommand(async () => await SubmitAsync());
         }
 
@@ -44,7 +46,10 @@ namespace DesktopTool.App.UI.ViewModel
                     _isLoginMode = value;
                     OnPropertyChanged(nameof(IsLoginMode));
                     OnPropertyChanged(nameof(IsRegisterMode));
-                    OnPropertyChanged(nameof(ActionButtonText)); 
+                    OnPropertyChanged(nameof(ActionButtonText));
+                    Name=string.Empty;
+                    Email=string.Empty;
+                    ErrorMessage = string.Empty;
                 }
             }
         }
@@ -75,6 +80,7 @@ namespace DesktopTool.App.UI.ViewModel
         }
 
         public ICommand SubmitCommand { get; }
+      
 
         private async Task SubmitAsync()
         {
@@ -93,9 +99,26 @@ namespace DesktopTool.App.UI.ViewModel
                     ErrorMessage = "Invalid email format.";
                     return;
                 }
+                var (success, role) = await _authService.LoginAsync(Email, Password);
+                if (success)
+                {
+                    MessageBox.Show("Login Successful");
+                    Application.Current.Windows
+       .OfType<Window>()
+       .FirstOrDefault(w => w.IsActive)
+       ?.Close();
+                    _roleWindowService.GetDashboardForRole(role);
+                    
 
-                var success = await _authService.LoginAsync(Email, Password);
-                ErrorMessage = success ? "Login Successful!" : "Login Failed";
+                    //// Show MainWindow (resolve from DI if using services)
+                    //var mainWindow = App.Current.Services.GetRequiredService<MainWindow>();
+                    //mainWindow.Show();
+                }
+                else
+                {
+                    ErrorMessage = "Login Failed";
+                }
+                
             }
             else
             {
@@ -135,6 +158,20 @@ namespace DesktopTool.App.UI.ViewModel
         protected void OnPropertyChanged([CallerMemberName] string name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        private void OpenTeacherWindow()
+        {
+            //var teacherWindow = new TeacherWindow(); // Create this
+            //teacherWindow.Show();
+            //Application.Current.Windows[0]?.Close(); // Close login
+        }
+
+        private void OpenStudentWindow()
+        {
+            //var studentWindow = new StudentWindow(); // Create this
+            //studentWindow.Show();
+            //Application.Current.Windows[0]?.Close(); // Close login
         }
     }
 }
