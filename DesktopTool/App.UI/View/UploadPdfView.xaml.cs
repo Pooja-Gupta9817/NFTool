@@ -17,14 +17,15 @@ using System.Windows.Shapes;
 namespace DesktopTool.App.UI.View
 {
     /// <summary>
-    /// Interaction logic for TeacherView.xaml
+    /// Interaction logic for UploadPdfView.xaml
     /// </summary>
-    public partial class TeacherView : UserControl
+    public partial class UploadPdfView : UserControl
     {
-        public TeacherView(TeacherViewModel tVM)
+           
+        public UploadPdfView()
         {
             InitializeComponent();
-            DataContext = tVM;
+           
         }
     }
 }

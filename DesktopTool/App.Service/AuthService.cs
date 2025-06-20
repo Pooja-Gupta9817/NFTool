@@ -5,7 +5,9 @@ using DesktopTool.App.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
@@ -92,6 +94,45 @@ namespace DesktopTool.App.Service
 
             return (true, roleClaim);
         }
+
+        public async Task<bool> UploadPdfAsync(string filePath, IProgress<int> progress = null)
+        {
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+                return false;
+
+            try
+            {
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+                using var content = new MultipartFormDataContent();
+                var streamContent = new StreamContent(fileStream);
+                streamContent.Headers.ContentType = new MediaTypeHeaderValue("application/pdf");
+
+                content.Add(streamContent, "file", Path.GetFileName(filePath));
+
+                // Optional: reset auth header (it should already be set from login)
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", _jwtToken);
+
+                // Track progress (simulate it here since HttpClient doesn't give it natively)
+                for (int i = 1; i <= 40; i++)
+                {
+                    await Task.Delay(10);
+                    progress?.Report(i);
+                }
+
+                var response = await _httpClient.PostAsync("/api/UploadPdf", content);
+
+                progress?.Report(100);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception ex)
+            {
+                // TODO: log or handle error
+                return false;
+            }
+        }
+
 
 
     }

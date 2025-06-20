@@ -2,6 +2,7 @@
 using DesktopTool.App.Core.Interfaces;
 using DesktopTool.App.Core.Models;
 using DesktopTool.App.Data;
+using DesktopTool.App.Infrastructure.Repository;
 using DesktopTool.App.Service;
 using DesktopTool.App.UI.View;
 using DesktopTool.App.UI.ViewModel;
@@ -31,6 +32,10 @@ namespace DesktopTool.App.Infrastructure
             services.AddTransient<StudentViewModel>();
             services.AddTransient<TeacherViewModel>();
 
+            services.AddTransient<UploadPdfViewModel>();
+            services.AddTransient<UploadMarksViewModel>();
+            services.AddTransient<StudentListViewModel>();
+
             // Register Views
             services.AddTransient<LoginView>();
 
@@ -45,6 +50,10 @@ namespace DesktopTool.App.Infrastructure
             services.AddSingleton<TeacherView>();
             services.AddSingleton<StudentView>();
             services.AddSingleton<MainWindow>();
+
+            services.AddSingleton<UploadPdfView>();
+            services.AddSingleton<UploadMarksView>();
+            services.AddSingleton<StudentListView>();
 
             services.AddSingleton<IRoleBasedDashboardService, RoleBasedDashboardService>();
             return services;

@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DesktopTool.App.Infrastructure
+namespace DesktopTool.App.Infrastructure.Repository
 {
     public class UserRepository : IUserRepository
     {

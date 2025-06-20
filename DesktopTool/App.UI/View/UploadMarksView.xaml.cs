@@ -17,14 +17,13 @@ using System.Windows.Shapes;
 namespace DesktopTool.App.UI.View
 {
     /// <summary>
-    /// Interaction logic for TeacherView.xaml
+    /// Interaction logic for UploadMarksView.xaml
     /// </summary>
-    public partial class TeacherView : UserControl
+    public partial class UploadMarksView : UserControl
     {
-        public TeacherView(TeacherViewModel tVM)
+        public UploadMarksView()
         {
             InitializeComponent();
-            DataContext = tVM;
         }
     }
 }

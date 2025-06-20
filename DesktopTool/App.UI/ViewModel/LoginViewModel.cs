@@ -102,17 +102,12 @@ namespace DesktopTool.App.UI.ViewModel
                 var (success, role) = await _authService.LoginAsync(Email, Password);
                 if (success)
                 {
-                    MessageBox.Show("Login Successful");
-                    Application.Current.Windows
-       .OfType<Window>()
-       .FirstOrDefault(w => w.IsActive)
-       ?.Close();
+                   
+                    Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive)?.Close();
+
                     _roleWindowService.GetDashboardForRole(role);
                     
 
-                    //// Show MainWindow (resolve from DI if using services)
-                    //var mainWindow = App.Current.Services.GetRequiredService<MainWindow>();
-                    //mainWindow.Show();
                 }
                 else
                 {

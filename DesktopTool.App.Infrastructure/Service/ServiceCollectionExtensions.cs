@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using DesktopTool.App.Core;
 using DesktopTool.App.Core.Models;
+using DesktopTool.App.Infrastructure.Repository;
 
 namespace DesktopTool.App.Infrastructure.Service
 {
@@ -11,6 +12,9 @@ namespace DesktopTool.App.Infrastructure.Service
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
+
+            services.AddDbContext<UploadDbContext>(options =>
+                 options.UseSqlServer(connectionString));
 
             services.AddScoped<IUserRepository, UserRepository>();
 

@@ -17,14 +17,13 @@ using System.Windows.Shapes;
 namespace DesktopTool.App.UI.View
 {
     /// <summary>
-    /// Interaction logic for TeacherView.xaml
+    /// Interaction logic for StudentListView.xaml
     /// </summary>
-    public partial class TeacherView : UserControl
+    public partial class StudentListView : UserControl
     {
-        public TeacherView(TeacherViewModel tVM)
+        public StudentListView()
         {
-            InitializeComponent();
-            DataContext = tVM;
+            InitializeComponent();  
         }
     }
 }
