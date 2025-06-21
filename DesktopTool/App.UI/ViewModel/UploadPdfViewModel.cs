@@ -10,7 +10,9 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 
 namespace DesktopTool.App.UI.ViewModel
 {
@@ -74,6 +76,8 @@ namespace DesktopTool.App.UI.ViewModel
         private async Task UploadFileAsync()
         {
             UploadProgress = 0;
+            
+
 
             var progress = new Progress<int>(value => UploadProgress = value);
 
@@ -81,7 +85,6 @@ namespace DesktopTool.App.UI.ViewModel
 
             if (success)
             {
-                // Notify user: success
             }
             else
             {

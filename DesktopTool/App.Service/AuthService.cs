@@ -67,9 +67,9 @@ namespace DesktopTool.App.Service
         }
 
 
-        public async Task<(bool Success, string Role)> LoginAsync(string email, string password)
+        public async Task<(bool success, string token, UserInfoDto user)> LoginAsync(string email, string password)
         {
-            var user = new LoginUserDto
+            var user = new LoginDto
             {
                 Email = email,
                 Password = password,
@@ -78,26 +78,16 @@ namespace DesktopTool.App.Service
             var json = JsonSerializer.Serialize(user);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PostAsync("/api/login", content);
+            var response = await _httpClient.PostAsync("api/login", content);
             if (!response.IsSuccessStatusCode)
-                return (false, null);
+                return (false, null, null);
 
-            var responseJson = await response.Content.ReadAsStringAsync();
-            var result = JsonSerializer.Deserialize<JwtResponse>(responseJson);
-            _jwtToken = result?.token;
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var result = JsonSerializer.Deserialize<LoginUserDto>(responseContent);
 
-            if (string.IsNullOrWhiteSpace(_jwtToken))
-                return (false, null);
-
-            _httpClient.DefaultRequestHeaders.Authorization =
-    new AuthenticationHeaderValue("Bearer", _jwtToken);
-
-            var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(_jwtToken);
-            var roleClaim = token.Claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
-
-            return (true, roleClaim);
+            return (true, result.Token, result.User);
         }
+
 
         public async Task<bool> UploadPdfAsync(string filePath, IProgress<int> progress = null)
         {

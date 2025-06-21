@@ -24,13 +24,12 @@ namespace DesktopTool.AzureFunctions
 
         [Function("LoginUser")]
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "login")] HttpRequestData req)
+     [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "login")] HttpRequestData req)
         {
             try
             {
                 var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-                _logger.LogInformation($"Request Body Length: {requestBody?.Length}");
-                var loginDto = JsonSerializer.Deserialize<LoginUserDto>(requestBody, new JsonSerializerOptions
+                var loginDto = JsonSerializer.Deserialize<LoginDto>(requestBody, new JsonSerializerOptions
                 {
                     PropertyNameCaseInsensitive = true
                 });
@@ -39,8 +38,6 @@ namespace DesktopTool.AzureFunctions
                 {
                     var badRequest = req.CreateResponse(HttpStatusCode.BadRequest);
                     await badRequest.WriteStringAsync("Invalid email or password");
-
-                    _logger.LogInformation($"Invalid email or password");
                     return badRequest;
                 }
 
@@ -49,22 +46,28 @@ namespace DesktopTool.AzureFunctions
                 {
                     var unauthorized = req.CreateResponse(HttpStatusCode.Unauthorized);
                     await unauthorized.WriteStringAsync("Invalid credentials");
-
-                    _logger.LogInformation($"Invalid credentials:{loginDto.Email}");
                     return unauthorized;
                 }
 
-                _logger.LogInformation($"Login Status: before token auth");
-
                 var token = JwtTokenGenerator.GenerateToken(user);
-                //_logger.LogInformation("Token: " + token);
-                var success = req.CreateResponse(HttpStatusCode.OK);
-                await success.WriteAsJsonAsync(new { token });
 
-                _logger.LogInformation($"Login Status: {success}");
-                return success;
+                // Construct response DTO
+                var responseDto = new LoginUserDto
+                {
+                    Token = token,
+                    User = new UserInfoDto
+                    {
+                        Email = user.Email,
+                        Name = user.Name,
+                        Role = user.Role
+                    }
+                };
+
+                var response = req.CreateResponse(HttpStatusCode.OK);
+                await response.WriteAsJsonAsync(responseDto);
+                return response;
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 _logger.LogError(ex, "Login failed.");
                 var error = req.CreateResponse(HttpStatusCode.InternalServerError);
@@ -72,5 +75,6 @@ namespace DesktopTool.AzureFunctions
                 return error;
             }
         }
+
     }
 }

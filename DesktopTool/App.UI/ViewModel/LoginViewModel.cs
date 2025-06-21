@@ -3,6 +3,7 @@ using DesktopTool.App.Core;
 using DesktopTool.App.Core.Interfaces;
 using DesktopTool.App.Core.Models;
 using DesktopTool.App.UI.Helper;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,12 +21,15 @@ namespace DesktopTool.App.UI.ViewModel
     {
         private readonly IAuthService _authService;
         private readonly IRoleBasedDashboardService _roleWindowService;
-        public LoginViewModel(IAuthService authService, IRoleBasedDashboardService roleWindowService)
+        private readonly IServiceProvider _serviceProvider; 
+        public LoginViewModel(IAuthService authService, IRoleBasedDashboardService roleWindowService , IServiceProvider serviceProvider)
         {
             _authService = authService;
             _roleWindowService= roleWindowService;
-            SubmitCommand = new RelayCommand(async () => await SubmitAsync());
+            SubmitCommand = new RelayCommand(async () => await SubmitAsync(), () => !IsBusy);
             Debug.WriteLine($"🧪 AuthService instance hash: {_authService.GetHashCode()}");
+
+            _serviceProvider= serviceProvider;
 
         }
         public Action CloseAction { get; set; }
@@ -57,6 +61,18 @@ namespace DesktopTool.App.UI.ViewModel
                 }
             }
         }
+        private bool _isBusy;
+        public bool IsBusy
+        {
+            get => _isBusy;
+            set
+            {
+                _isBusy = value;
+                OnPropertyChanged(nameof(IsBusy));
+                // Notify command that CanExecute might have changed
+                ((RelayCommand)SubmitCommand).RaiseCanExecuteChanged();
+            }
+        }
 
         private bool _isTeacher = false;
         public bool IsTeacher
@@ -84,59 +100,73 @@ namespace DesktopTool.App.UI.ViewModel
         }
 
         public ICommand SubmitCommand { get; }
-      
+
 
         private async Task SubmitAsync()
         {
-            ErrorMessage = string.Empty; 
+            if (IsBusy) return;
 
-            if (IsLoginMode)
+            IsBusy = true;
+
+            try
             {
-                if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
-                {
-                    ErrorMessage = "Email and Password are required.";
-                    return;
-                }
+                ErrorMessage = string.Empty;
 
-                if (!IsValidEmail(Email))
+                if (IsLoginMode)
                 {
-                    ErrorMessage = "Invalid email format.";
-                    return;
-                }
-                var (success, role) = await _authService.LoginAsync(Email, Password);
-                if (success)
-                {
-                   
-                    //Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive)?.Close();
+                    if (string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+                    {
+                        ErrorMessage = "Email and Password are required.";
+                        return;
+                    }
 
-                    _roleWindowService.GetDashboardForRole(role);
-                    CloseAction?.Invoke(); // this will close the window
+                    if (!IsValidEmail(Email))
+                    {
+                        ErrorMessage = "Invalid email format.";
+                        return;
+                    }
+
+                    var (success, token, user) = await _authService.LoginAsync(Email, Password);
+                    if (success)
+                    {
+                        var userContext = _serviceProvider.GetRequiredService<IUserContext>();
+                        userContext.Email = user.Email;
+                        userContext.Name = user.Name;
+                        userContext.Role = user.Role;
+
+                        _roleWindowService.GetDashboardForRole(user.Role);
+                        CloseAction?.Invoke();
+                    }
+                    else
+                    {
+                        ErrorMessage = "Login Failed";
+                    }
                 }
                 else
                 {
-                    ErrorMessage = "Login Failed";
+                    if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
+                    {
+                        ErrorMessage = "All fields are required.";
+                        return;
+                    }
+
+                    if (!IsValidEmail(Email))
+                    {
+                        ErrorMessage = "Invalid email format.";
+                        return;
+                    }
+
+                    var role = IsTeacher ? "Teacher" : "Student";
+                    var success = await _authService.RegisterAsync(Name, Email, Password, role);
+                    ErrorMessage = success ? "Registration Successful!" : "User already exists";
                 }
-                
             }
-            else
+            finally
             {
-                if (string.IsNullOrWhiteSpace(Name) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
-                {
-                    ErrorMessage = "All fields are required.";
-                    return;
-                }
-
-                if (!IsValidEmail(Email))
-                {
-                    ErrorMessage = "Invalid email format.";
-                    return;
-                }
-
-                var role = IsTeacher ? "Teacher" : "Student";
-                var success = await _authService.RegisterAsync(Name, Email, Password, role);
-                ErrorMessage = success ? "Registration Successful!" : "User already exists";
+                IsBusy = false;
             }
         }
+
 
         private bool IsValidEmail(string email)
         {

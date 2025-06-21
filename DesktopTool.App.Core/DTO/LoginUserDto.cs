@@ -8,8 +8,18 @@ namespace DesktopTool.App.Core
 {
     public class LoginUserDto
     {
+        public string Token { get; set; }
+        public UserInfoDto User { get; set; }
+    }
+    public class LoginDto
+    {
         public string Email { get; set; }
         public string Password { get; set; }
     }
-
+    public class UserInfoDto
+    {
+        public string Email { get; set; }
+        public string Name { get; set; }
+        public string Role { get; set; }
+    }
 }

@@ -1,4 +1,5 @@
 ﻿using App.UI.ViewModel;
+using DesktopTool.App.Core.Interfaces;
 using DesktopTool.App.UI.Helper;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -16,10 +17,15 @@ namespace DesktopTool.App.UI.ViewModel
     public class TeacherViewModel : INotifyPropertyChanged
     {
         private readonly IServiceProvider _serviceProvider;
+        public string LoggedInUserName { get; }
+        public string LoggedInUserEmail { get; }
 
-        public TeacherViewModel(IServiceProvider serviceProvider)
+
+        public TeacherViewModel(IServiceProvider serviceProvider, IUserContext userContext)
         {
             _serviceProvider = serviceProvider;
+            LoggedInUserName = userContext.Name;     // E.g., "Payal"
+            LoggedInUserEmail = userContext.Email;
 
             OpenUploadPdfCommand = new RelayCommand(OpenUploadPdf);
             OpenUploadMarksCommand = new RelayCommand(OpenUploadMarks);
