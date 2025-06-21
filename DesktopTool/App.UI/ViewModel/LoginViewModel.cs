@@ -6,6 +6,7 @@ using DesktopTool.App.UI.Helper;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -24,7 +25,10 @@ namespace DesktopTool.App.UI.ViewModel
             _authService = authService;
             _roleWindowService= roleWindowService;
             SubmitCommand = new RelayCommand(async () => await SubmitAsync());
+            Debug.WriteLine($"🧪 AuthService instance hash: {_authService.GetHashCode()}");
+
         }
+        public Action CloseAction { get; set; }
 
         private string _name;
         public string Name { get => _name; set { _name = value; OnPropertyChanged(); } }
@@ -103,11 +107,10 @@ namespace DesktopTool.App.UI.ViewModel
                 if (success)
                 {
                    
-                    Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive)?.Close();
+                    //Application.Current.Windows.OfType<Window>().FirstOrDefault(w => w.IsActive)?.Close();
 
                     _roleWindowService.GetDashboardForRole(role);
-                    
-
+                    CloseAction?.Invoke(); // this will close the window
                 }
                 else
                 {

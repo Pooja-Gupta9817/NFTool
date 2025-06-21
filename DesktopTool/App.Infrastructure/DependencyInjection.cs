@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -40,12 +41,20 @@ namespace DesktopTool.App.Infrastructure
             services.AddTransient<LoginView>();
 
             //  Register AuthService
-           // services.AddHttpClient<IAuthService, AuthService>();
+            // services.AddHttpClient<IAuthService, AuthService>();
 
-            services.AddHttpClient<IAuthService, AuthService>(client =>
+            services.AddSingleton<IAuthService>(provider =>
             {
+                var clientFactory = provider.GetRequiredService<IHttpClientFactory>();
+                var client = clientFactory.CreateClient();
                 client.BaseAddress = new Uri("http://localhost:7071");
+
+                var dbContext = provider.GetRequiredService<ApplicationDbContext>();
+                return new AuthService(dbContext, client);
             });
+
+            services.AddHttpClient();
+
 
             services.AddSingleton<TeacherView>();
             services.AddSingleton<StudentView>();
@@ -56,6 +65,8 @@ namespace DesktopTool.App.Infrastructure
             services.AddSingleton<StudentListView>();
 
             services.AddSingleton<IRoleBasedDashboardService, RoleBasedDashboardService>();
+            services.AddSingleton<IUploadedFileRepository, UploadedFileRepository>();
+
             return services;
 
 

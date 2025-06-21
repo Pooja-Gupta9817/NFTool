@@ -5,6 +5,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -51,6 +52,8 @@ namespace DesktopTool.App.UI.ViewModel
             SelectFileCommand = new RelayCommand(SelectFile);
             _authService = authService;
             UploadCommand = new RelayCommand(async () => await UploadFileAsync(), () => !string.IsNullOrEmpty(SelectedFilePath));
+            Debug.WriteLine($"🧪 AuthService instance hash: {_authService.GetHashCode()}");
+
         }
 
         private void SelectFile()

@@ -1,15 +1,23 @@
 ﻿using Azure.Storage.Blobs;
+using DesktopTool.App.Core.Interfaces;
+using DesktopTool.App.Core.Models;
+using DesktopTool.App.Infrastructure;
+using DesktopTool.App.Infrastructure.Repository;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.Net.Http.Headers;
-using System.Data.SqlClient;
+using Polly;
+using System.ComponentModel;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
+using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using System;
 
 namespace DesktopTool.AzureFunctions.Functions
 {
@@ -18,12 +26,17 @@ namespace DesktopTool.AzureFunctions.Functions
         private readonly BlobServiceClient _blobServiceClient;
         private readonly ILogger _logger;
         private readonly string _connectionString;
+        private readonly string _containerName;
+        private readonly IUploadedFileRepository _uploadedFileRepository;
 
-        public UploadPdfFunction(BlobServiceClient blobServiceClient, ILogger<UploadPdfFunction> logger)
+
+        public UploadPdfFunction(BlobServiceClient blobServiceClient, ILogger<UploadPdfFunction> logger, IConfiguration config , IUploadedFileRepository uploadedFileRepository)
         {
             _blobServiceClient = blobServiceClient;
             _logger = logger;
-            _connectionString = Environment.GetEnvironmentVariable("SqlConnectionString");
+            _connectionString = config["SqlConnectionString"] ?? throw new ArgumentNullException("SqlConnectionString");
+            _containerName = config["BlobContainerName"] ?? "pdfuploads";
+            _uploadedFileRepository = uploadedFileRepository;
         }
 
         [Function("UploadPdf")]
@@ -32,43 +45,44 @@ namespace DesktopTool.AzureFunctions.Functions
         {
             try
             {
-                var jwt = req.Headers.TryGetValues("Authorization", out var authHeaders)
-                          ? authHeaders.FirstOrDefault()?.Replace("Bearer ", "")
-                          : null;
+                _logger.LogInformation("Starting upload");
+                string? jwt = req.Headers.GetValues("Authorization").FirstOrDefault()?.Replace("Bearer ", "");
+                _logger.LogInformation($"JWT raw: {jwt}");
+                string username = ExtractUsernameFromJwt(jwt);
 
-                _logger.LogInformation("Token: " + jwt);
 
-                var username = ExtractUsernameFromJwt(jwt);
-                if (username == null)
-                {
-                    var unauthorized = req.CreateResponse(HttpStatusCode.Unauthorized);
-                    await unauthorized.WriteStringAsync("Invalid JWT token.");
-                    return unauthorized;
-                }
 
-                var contentType = req.Headers.GetValues("Content-Type").FirstOrDefault();
+                if (!req.Headers.TryGetValues("Content-Type", out var contentTypeValues))
+                    return await CreateBadRequest(req, "Missing Content-Type header.");
+
+                var contentType = contentTypeValues.FirstOrDefault();
                 var boundary = HeaderUtilities.RemoveQuotes(MediaTypeHeaderValue.Parse(contentType).Boundary).Value;
+
+                if (string.IsNullOrEmpty(boundary))
+                    return await CreateBadRequest(req, "Boundary not found.");
+
                 var reader = new MultipartReader(boundary, req.Body);
                 var section = await reader.ReadNextSectionAsync();
-
                 if (section == null)
-                {
-                    var bad = req.CreateResponse(HttpStatusCode.BadRequest);
-                    await bad.WriteStringAsync("No file section found.");
-                    return bad;
-                }
+                    return await CreateBadRequest(req, "No section in body.");
 
-                var uniqueFileName = $"upload_{Guid.NewGuid()}.pdf";
-                var containerClient = _blobServiceClient.GetBlobContainerClient("pdfuploads");
+                var fileName = GetFileNameFromContentDisposition(section);
+                var uniqueFileName = $"{Path.GetFileNameWithoutExtension(fileName)}_{Guid.NewGuid()}{Path.GetExtension(fileName)}";
+
+                var containerClient = _blobServiceClient.GetBlobContainerClient(_containerName);
                 await containerClient.CreateIfNotExistsAsync();
 
+                var memoryStream = new MemoryStream();
+                await section.Body.CopyToAsync(memoryStream);
+                memoryStream.Position = 0; // rewind to start
+
                 var blobClient = containerClient.GetBlobClient(uniqueFileName);
-                await blobClient.UploadAsync(section.Body, overwrite: true);
 
-                var fileSize = section.Body.Length;
+                _logger.LogInformation($"Uploading file: {fileName} with size: {memoryStream.Length} bytes");
 
-                await EnsureTableExistsAsync();
-                await LogMetadataAsync(username, uniqueFileName, fileSize);
+                await blobClient.UploadAsync(memoryStream, overwrite: true);
+                await LogMetadataToSqlAsync(uniqueFileName, memoryStream.Length, username);
+
 
                 var ok = req.CreateResponse(HttpStatusCode.OK);
                 await ok.WriteStringAsync($"File uploaded: {uniqueFileName}");
@@ -83,50 +97,75 @@ namespace DesktopTool.AzureFunctions.Functions
             }
         }
 
-        private string? ExtractUsernameFromJwt(string? jwt)
+        private string GetFileNameFromContentDisposition(MultipartSection section)
         {
-            if (string.IsNullOrEmpty(jwt)) return null;
+            var contentDisposition = section.ContentDisposition;
+
+            if (ContentDispositionHeaderValue.TryParse(contentDisposition, out var disposition))
+            {
+                var fileName = disposition.FileName.Value ?? disposition.FileNameStar.Value;
+                return fileName?.Trim('"') ?? string.Empty;
+            }
+
+            return string.Empty;
+        }
+
+        private string ExtractUsernameFromJwt(string? jwt)
+        {
+            if (string.IsNullOrWhiteSpace(jwt))
+            {
+                _logger.LogWarning("JWT is null or empty.");
+                return "anonymous";
+            }
 
             var handler = new JwtSecurityTokenHandler();
-            var token = handler.ReadJwtToken(jwt);
 
-            // Customize this to match your claim name (e.g., "preferred_username", "email", "sub", etc.)
-            return token.Claims.FirstOrDefault(c => c.Type == "preferred_username" || c.Type == "upn" || c.Type == "email")?.Value;
+            if (!handler.CanReadToken(jwt))
+            {
+                _logger.LogWarning("JWT format is invalid.");
+                return "anonymous";
+            }
+
+            try
+            {
+                var token = handler.ReadJwtToken(jwt);
+                foreach (var claim in token.Claims)
+                {
+                    _logger.LogInformation($"Claim: {claim.Type} = {claim.Value}");
+                }
+                return  token.Claims.FirstOrDefault(c =>
+    c.Type == "name" || c.Type == ClaimTypes.Name)?.Value ?? "anonymous";
+
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "JWT parsing failed.");
+                return "anonymous";
+            }
         }
 
-        private async Task EnsureTableExistsAsync()
-        {
-            var query = @"
-                IF NOT EXISTS (SELECT * FROM sysobjects WHERE name='PdfUploads' AND xtype='U')
-                CREATE TABLE PdfUploads (
-                    Id INT IDENTITY PRIMARY KEY,
-                    Username NVARCHAR(255),
-                    FileName NVARCHAR(255),
-                    FileSize BIGINT,
-                    UploadedAt DATETIME DEFAULT GETDATE()
-                );
-            ";
 
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand(query, conn);
-            await conn.OpenAsync();
-            await cmd.ExecuteNonQueryAsync();
+        private async Task LogMetadataToSqlAsync(string fileName, long size, string username)
+        {
+            var file = new UploadedFiles
+            {
+                FileName = fileName,
+                Size = size,
+                UploadedBy = username
+            };
+
+            await _uploadedFileRepository.AddAsync(file);
+            await _uploadedFileRepository.SaveChangesAsync();
         }
 
-        private async Task LogMetadataAsync(string username, string fileName, long fileSize)
-        {
-            var insert = @"
-                INSERT INTO PdfUploads (Username, FileName, FileSize)
-                VALUES (@Username, @FileName, @FileSize);
-            ";
 
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand(insert, conn);
-            cmd.Parameters.AddWithValue("@Username", username);
-            cmd.Parameters.AddWithValue("@FileName", fileName);
-            cmd.Parameters.AddWithValue("@FileSize", fileSize);
-            await conn.OpenAsync();
-            await cmd.ExecuteNonQueryAsync();
+
+        private async Task<HttpResponseData> CreateBadRequest(HttpRequestData req, string message)
+        {
+            var response = req.CreateResponse(HttpStatusCode.BadRequest);
+            await response.WriteStringAsync(message);
+            return response;
         }
     }
 }

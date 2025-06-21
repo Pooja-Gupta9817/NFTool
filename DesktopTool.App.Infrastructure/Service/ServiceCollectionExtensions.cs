@@ -13,9 +13,6 @@ namespace DesktopTool.App.Infrastructure.Service
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString));
 
-            services.AddDbContext<UploadDbContext>(options =>
-                 options.UseSqlServer(connectionString));
-
             services.AddScoped<IUserRepository, UserRepository>();
 
             return services;

@@ -5,29 +5,66 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              xmlns:local="clr-namespace:DesktopTool.App.UI.View"
              mc:Ignorable="d" 
-             
              d:DesignHeight="450" d:DesignWidth="800">
 
     <UserControl.Resources>
         <local:NullToBoolConverter x:Key="NullToBoolConverter" />
+
+        <!-- Modern Button Style -->
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#4CAF50"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="0,5,0,0"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
-    <Grid>
-        <StackPanel Margin="20">
-            <TextBlock Text="Upload PDF File" FontSize="16" FontWeight="Bold" Margin="0 0 0 10" />
 
-            <Button Content="Select PDF File"
-            Command="{Binding SelectFileCommand}"
-            Width="150" Margin="0 0 0 10"/>
+    <Grid Background="#FAFAFA">
+        <Border Background="White" Padding="20" Margin="40"
+                CornerRadius="10" BorderBrush="#DDD" BorderThickness="1"
+                Effect="{DynamicResource {x:Static SystemParameters.DropShadowKey}}">
+            <StackPanel>
+                <TextBlock Text="Upload PDF File" 
+                           FontSize="20" 
+                           FontWeight="Bold" 
+                           Margin="0 0 0 20" 
+                           Foreground="#333"/>
 
-            <TextBlock Text="{Binding FileName}" FontStyle="Italic" />
+                <Button Content="Select PDF File"
+                        Command="{Binding SelectFileCommand}" />
 
-            <Button Content="Upload PDF"
-        Command="{Binding UploadCommand}"
-        Width="150" Margin="0 10 0 10"
-        IsEnabled="{Binding SelectedFilePath, Converter={StaticResource NullToBoolConverter}}" />
+                <TextBlock Text="{Binding FileName}" 
+                           FontStyle="Italic" 
+                           Foreground="#666" 
+                           Margin="0 5 0 10"/>
 
-            <TextBlock Text="{Binding UploadProgress, StringFormat=Progress: {0}%}" Margin="0 0 0 5"/>
-            <ProgressBar Value="{Binding UploadProgress}" Height="20" Maximum="100"/>
-        </StackPanel>
+                <Button Content="Upload PDF"
+                        Command="{Binding UploadCommand}"
+                        IsEnabled="{Binding SelectedFilePath, Converter={StaticResource NullToBoolConverter}}"/>
+
+                <TextBlock Text="{Binding UploadProgress, StringFormat=Progress: {0}%}" 
+                           Margin="0 15 0 5" 
+                           Foreground="#555"/>
+
+                <ProgressBar Value="{Binding UploadProgress}" 
+                             Height="20" 
+                             Maximum="100"
+                             Foreground="#4CAF50" 
+                             Background="#EEE"></ProgressBar>
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

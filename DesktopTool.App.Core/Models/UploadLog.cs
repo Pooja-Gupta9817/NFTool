@@ -6,13 +6,13 @@ using System.Threading.Tasks;
 
 namespace DesktopTool.App.Core.Models
 {
-    public class UploadLog
+    public class UploadedFiles
     {
         public int Id { get; set; }
         public string FileName { get; set; }
-        public long FileSize { get; set; }
+        public long Size { get; set; }
         public string UploadedBy { get; set; }
-        public DateTime UploadedAt { get; set; }
+        public DateTime UploadedAt { get; set; } = DateTime.Now;
     }
 
 }

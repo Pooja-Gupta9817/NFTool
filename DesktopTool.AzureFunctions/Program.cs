@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using DesktopTool.App.Core.Interfaces;
 using DesktopTool.App.Core.Models;
 using DesktopTool.App.Infrastructure.Repository;
 using DesktopTool.App.Infrastructure.Service;
@@ -24,6 +25,7 @@ var host = new HostBuilder()
     {
         services.AddInfrastructure(connectionString);
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUploadedFileRepository, UploadedFileRepository>();
 
         // Register BlobServiceClient 
         services.AddSingleton(sp =>

@@ -11,6 +11,7 @@ namespace DesktopTool.App.Core.Models
         Task<bool> RegisterAsync(string name, string email, string password, string role);
         Task<(bool Success, string Role)> LoginAsync(string email, string password);
         Task<bool> UploadPdfAsync(string filePath, IProgress<int> progress = null);
+       
 
 
     }

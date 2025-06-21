@@ -4,6 +4,7 @@ using DesktopTool.App.Data;
 using DesktopTool.App.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Net.Http;
@@ -30,7 +31,7 @@ namespace DesktopTool.App.Service
         {
             _context = context;
             _httpClient = httpClient;
-            _httpClient.DefaultRequestHeaders.Authorization =
+          //  _httpClient.DefaultRequestHeaders.Authorization =
                                             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", TokenStorage.GetToken());
 
         }
@@ -88,6 +89,9 @@ namespace DesktopTool.App.Service
             if (string.IsNullOrWhiteSpace(_jwtToken))
                 return (false, null);
 
+            _httpClient.DefaultRequestHeaders.Authorization =
+    new AuthenticationHeaderValue("Bearer", _jwtToken);
+
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(_jwtToken);
             var roleClaim = token.Claims.FirstOrDefault(c => c.Type.Contains("role"))?.Value;
@@ -100,8 +104,17 @@ namespace DesktopTool.App.Service
             if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
                 return false;
 
+            if (string.IsNullOrWhiteSpace(JwtToken))
+            {
+                Debug.WriteLine("❌ JWT Token is NULL or EMPTY before upload.");
+                return false;
+            }
+
             try
             {
+                Debug.WriteLine("✅ JWT Token being used for upload:");
+                Debug.WriteLine(_jwtToken);
+
                 using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
                 using var content = new MultipartFormDataContent();
                 var streamContent = new StreamContent(fileStream);
@@ -109,9 +122,16 @@ namespace DesktopTool.App.Service
 
                 content.Add(streamContent, "file", Path.GetFileName(filePath));
 
-                // Optional: reset auth header (it should already be set from login)
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new AuthenticationHeaderValue("Bearer", _jwtToken);
+                if (!string.IsNullOrWhiteSpace(JwtToken))
+                {
+                    _httpClient.DefaultRequestHeaders.Authorization =
+                        new AuthenticationHeaderValue("Bearer", JwtToken);
+                }
+                else
+                {
+                    Debug.WriteLine("⚠️ JWT token is missing. Upload will fail.");
+                }
+
 
                 // Track progress (simulate it here since HttpClient doesn't give it natively)
                 for (int i = 1; i <= 40; i++)
@@ -128,7 +148,7 @@ namespace DesktopTool.App.Service
             }
             catch (Exception ex)
             {
-                // TODO: log or handle error
+                Debug.WriteLine($"❌ Upload failed: {ex.Message}");
                 return false;
             }
         }

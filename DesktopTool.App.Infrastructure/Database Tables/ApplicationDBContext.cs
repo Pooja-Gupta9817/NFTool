@@ -15,6 +15,7 @@ namespace DesktopTool.App.Infrastructure
             : base(options) { }
 
         public DbSet<User> Users => Set<User>();// Table name
+        public DbSet<UploadedFiles> UploadedFiles { get; set; }
 
 
         // Optional: for manual configuration

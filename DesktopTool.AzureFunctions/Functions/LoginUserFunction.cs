@@ -56,8 +56,8 @@ namespace DesktopTool.AzureFunctions
 
                 _logger.LogInformation($"Login Status: before token auth");
 
-                var token = JwtTokenGenerator.GenerateToken(user.Email, user.Role);
-               // _logger.LogInformation("Token: " + token);
+                var token = JwtTokenGenerator.GenerateToken(user);
+                //_logger.LogInformation("Token: " + token);
                 var success = req.CreateResponse(HttpStatusCode.OK);
                 await success.WriteAsJsonAsync(new { token });
 

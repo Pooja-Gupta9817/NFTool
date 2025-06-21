@@ -26,6 +26,7 @@ namespace DesktopTool.App.UI.View
         public LoginView(LoginViewModel VM)
         {
             InitializeComponent();
+            VM.CloseAction = new Action(this.Close);
             DataContext = VM;
         }
 
