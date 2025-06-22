@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopTool.AzureFunctions"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopTool.App.UnitTest", "DesktopTool.App.UnitTest\DesktopTool.App.UnitTest.csproj", "{03297130-E0C8-4CE4-8AC6-955249D5233E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DesktopTool.App.Themes", "DesktopTool.App.Themes\DesktopTool.App.Themes.csproj", "{C61309CA-E613-4DE2-87A9-E1874D59C543}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{03297130-E0C8-4CE4-8AC6-955249D5233E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{03297130-E0C8-4CE4-8AC6-955249D5233E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{03297130-E0C8-4CE4-8AC6-955249D5233E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C61309CA-E613-4DE2-87A9-E1874D59C543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C61309CA-E613-4DE2-87A9-E1874D59C543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C61309CA-E613-4DE2-87A9-E1874D59C543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C61309CA-E613-4DE2-87A9-E1874D59C543}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,7 +21,10 @@ namespace DesktopTool.App.UI.ViewModel
     {
         private readonly IAuthService _authService;
         private readonly IRoleBasedDashboardService _roleWindowService;
-        private readonly IServiceProvider _serviceProvider; 
+        private readonly IServiceProvider _serviceProvider;
+        private bool _isDarkTheme = false;
+      
+
         public LoginViewModel(IAuthService authService, IRoleBasedDashboardService roleWindowService , IServiceProvider serviceProvider)
         {
             _authService = authService;
@@ -30,6 +33,8 @@ namespace DesktopTool.App.UI.ViewModel
             Debug.WriteLine($"🧪 AuthService instance hash: {_authService.GetHashCode()}");
 
             _serviceProvider= serviceProvider;
+            var theme = _isDarkTheme ? "DarkTheme.xaml" : "LightTheme.xaml";
+            ThemeManager.ApplyTheme(theme);
 
         }
         public Action CloseAction { get; set; }
@@ -73,6 +78,12 @@ namespace DesktopTool.App.UI.ViewModel
                 ((RelayCommand)SubmitCommand).RaiseCanExecuteChanged();
             }
         }
+
+        public ICommand ToggleThemeCommand => new RelayCommand(() =>
+        {
+            _isDarkTheme = !_isDarkTheme;
+            ThemeManager.ApplyTheme(_isDarkTheme ? "DarkTheme.xaml" : "LightTheme.xaml");
+        });
 
         private bool _isTeacher = false;
         public bool IsTeacher

@@ -9,72 +9,49 @@
 
     <UserControl.Resources>
         <local:NullToBoolConverter x:Key="NullToBoolConverter" />
-
-        <!-- Modern Button Style -->
-        <Style TargetType="Button">
-            <Setter Property="Background" Value="#4CAF50"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Padding" Value="10,5"/>
-            <Setter Property="Margin" Value="0,5,0,0"/>
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}" 
-                                CornerRadius="6"
-                                Padding="{TemplateBinding Padding}">
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                                <ContentPresenter/>
-                            </StackPanel>
-                        </Border>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
 
-    <Grid Background="#FAFAFA">
-        <Border Background="White" Padding="20" Margin="40"
-                CornerRadius="10" BorderBrush="#DDD" BorderThickness="1">
+    <Grid Background="{DynamicResource BackgroundBrush}">
+        <Border Background="{DynamicResource ControlBackgroundBrush}" Padding="20" Margin="40"
+                CornerRadius="10" BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="1">
             <StackPanel>
                 <TextBlock Text="Upload PDF File" 
                            FontSize="20" 
                            FontWeight="Bold" 
                            Margin="0 0 0 20" 
-                           Foreground="#333"/>
+                           Foreground="{DynamicResource ForegroundBrush}"/>
 
                 <!-- Select File Button -->
                 <Button Command="{Binding SelectFileCommand}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="pack://application:,,,/Assets/openFile.png" Width="16" Height="16" Margin="0,0,5,0"/>
+                        <Image Source="/Assets/openFile.png" Width="16" Height="16" Margin="0,0,5,0"/>
                         <TextBlock Text="Select PDF File"/>
                     </StackPanel>
                 </Button>
 
                 <TextBlock Text="{Binding FileName}" 
                            FontStyle="Italic" 
-                           Foreground="#666" 
+                           Foreground="{DynamicResource ForegroundBrush}" 
                            Margin="0 5 0 10"/>
 
                 <!-- Upload Button -->
                 <Button Command="{Binding UploadCommand}"
                         IsEnabled="{Binding SelectedFilePath, Converter={StaticResource NullToBoolConverter}}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="pack://application:,,,/Assets/upload.png" Width="16" Height="16" Margin="0,0,5,0"/>
-                        <TextBlock Text="Upload PDF" />
+                        <Image Source="/Assets/upload.png" Width="16" Height="16" Margin="0,0,5,0"/>
+                        <TextBlock Text="Upload PDF"/>
                     </StackPanel>
                 </Button>
 
                 <!-- Progress -->
                 <TextBlock Text="{Binding UploadProgress, StringFormat=Progress: {0}%}" 
                            Margin="0 15 0 5" 
-                           Foreground="#555"/>
+                           Foreground="{DynamicResource ForegroundBrush}"/>
                 <ProgressBar Value="{Binding UploadProgress}" 
                              Height="20" 
                              Maximum="100"
-                             Foreground="#4CAF50" 
-                             Background="#EEE"></ProgressBar>
+                             Foreground="{DynamicResource AccentBrush}" 
+                             Background="{DynamicResource ControlBackgroundBrush}"/>
 
                 <!-- Success Message -->
                 <TextBlock x:Name="SuccessMessage"

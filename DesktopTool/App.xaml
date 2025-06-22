@@ -9,6 +9,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="/App.UI/Styles/AppStyles.xaml" />
+                <ResourceDictionary Source="/DesktopTool.App.Themes;component/LightTheme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
             
             <DataTemplate DataType="{x:Type vm:UploadPdfViewModel}">

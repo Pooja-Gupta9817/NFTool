@@ -26,6 +26,8 @@
   <ItemGroup>
     <ProjectReference Include="..\DesktopTool.App.Core\DesktopTool.App.Core.csproj" />
     <ProjectReference Include="..\DesktopTool.App.Infrastructure\DesktopTool.App.Infrastructure.csproj" />
+    <ProjectReference Include="..\DesktopTool.App.Themes\DesktopTool.App.Themes.csproj" />
+    <ProjectReference Include="..\DesktopTool.App.UnitTest\DesktopTool.App.UnitTest.csproj" />
   </ItemGroup>
 
 </Project>

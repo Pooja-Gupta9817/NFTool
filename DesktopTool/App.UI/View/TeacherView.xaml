@@ -5,36 +5,31 @@
              xmlns:local="clr-namespace:DesktopTool.App.UI.View"
              Height="Auto" Width="Auto">
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <!-- Top user info -->
-            <RowDefinition Height="*"/>
-            <!-- Main layout -->
-        </Grid.RowDefinitions>
+    <DockPanel>
+        <!-- Sidebar -->
+        <StackPanel Background="{DynamicResource ApplicationThemeBrush}" Width="180" DockPanel.Dock="Left">
+            <TextBlock Text="Teacher Panel" Foreground="{DynamicResource ForegroundBrush}" FontWeight="Bold" FontSize="16" Margin="0 10"/>
+            <Button Content="📄 Upload PDF" Command="{Binding OpenUploadPdfCommand}" Style="{StaticResource NavButton}" />
+            <Button Content="📊 Upload Marks" Command="{Binding OpenUploadMarksCommand}" Style="{StaticResource NavButton}" />
+            <Button Content="👥 View Students" Command="{Binding OpenStudentListCommand}" Style="{StaticResource NavButton}" />
+        </StackPanel>
 
-        <!-- ✅ Top Bar with User Info -->
-        <Border Grid.Row="0" Background="Transparent" Padding="10" BorderBrush="#DDD" BorderThickness="0 0 0 1">
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <TextBlock Text="👤 Name: " FontWeight="Bold" Foreground="#333"/>
-                <TextBlock Text="{Binding LoggedInUserName}" Margin="5,0,15,0" Foreground="#333"/>
-                <TextBlock Text="📧 Email: " FontWeight="Bold" Foreground="#333"/>
-                <TextBlock Text="{Binding LoggedInUserEmail}" Foreground="#333"/>
+        <!-- Top Info and Theme -->
+        <DockPanel DockPanel.Dock="Top" Background="{DynamicResource ControlBackgroundBrush}" Height="50">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
+                <TextBlock Text="Name: " FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
+                <TextBlock Text="{Binding LoggedInUserName}" Margin="5,0" Foreground="{DynamicResource ForegroundBrush}"/>
+                <TextBlock Text="Email: " FontWeight="Bold" Margin="20,0,0,0" Foreground="{DynamicResource ForegroundBrush}"/>
+                <TextBlock Text="{Binding LoggedInUserEmail}" Margin="5,0" Foreground="{DynamicResource ForegroundBrush}"/>
             </StackPanel>
-        </Border>
-
-        <!-- ✅ Main Content -->
-        <DockPanel Grid.Row="1">
-            <!-- Sidebar -->
-            <StackPanel Background="#2B2D42" Width="180" DockPanel.Dock="Left">
-                <TextBlock Text="Teacher Panel" Foreground="White" FontWeight="Bold" FontSize="16" Margin="0 10"/>
-                <Button Content="📄 Upload PDF" Command="{Binding OpenUploadPdfCommand}" Style="{StaticResource NavButton}" />
-                <Button Content="📊 Upload Marks" Command="{Binding OpenUploadMarksCommand}" Style="{StaticResource NavButton}" />
-                <Button Content="👥 View Students" Command="{Binding OpenStudentListCommand}" Style="{StaticResource NavButton}" />
-            </StackPanel>
-
-            <!-- Main View -->
-            <ContentControl Content="{Binding CurrentViewModel}" DockPanel.Dock="Right" />
+            <Button Content="🌙/☀"
+                    Command="{Binding ToggleThemeCommand}"
+                    Background="Transparent"
+                    Foreground="{DynamicResource ForegroundBrush}"
+                    Width="40" Height="30" Margin="10" HorizontalAlignment="Right"/>
         </DockPanel>
-    </Grid>
+
+        <!-- Content -->
+        <ContentControl Content="{Binding CurrentViewModel}" DockPanel.Dock="Right" Background="{DynamicResource BackgroundBrush}"/>
+    </DockPanel>
 </UserControl>
