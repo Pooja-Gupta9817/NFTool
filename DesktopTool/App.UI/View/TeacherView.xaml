@@ -7,26 +7,32 @@
 
     <DockPanel>
         <!-- Sidebar -->
-        <StackPanel Background="{DynamicResource ApplicationThemeBrush}" Width="180" DockPanel.Dock="Left">
-            <TextBlock Text="Teacher Panel" Foreground="{DynamicResource ForegroundBrush}" FontWeight="Bold" FontSize="16" Margin="0 10"/>
-            <Button Content="📄 Upload PDF" Command="{Binding OpenUploadPdfCommand}" Style="{StaticResource NavButton}" />
-            <Button Content="📊 Upload Marks" Command="{Binding OpenUploadMarksCommand}" Style="{StaticResource NavButton}" />
-            <Button Content="👥 View Students" Command="{Binding OpenStudentListCommand}" Style="{StaticResource NavButton}" />
+        <StackPanel Background="Navy" Width="180" DockPanel.Dock="Left">
+            <TextBlock Text="Teacher Panel" Foreground="White" FontWeight="Bold" FontSize="16" Margin="0 10"/>
+            <Button Content="📄 Upload PDF" Command="{Binding OpenUploadPdfCommand}"  />
+            <Button Content="📊 Upload Marks" Command="{Binding OpenUploadMarksCommand}"  />
+            <Button Content="👥 View Students" Command="{Binding OpenStudentListCommand}" />
         </StackPanel>
 
         <!-- Top Info and Theme -->
-        <DockPanel DockPanel.Dock="Top" Background="{DynamicResource ControlBackgroundBrush}" Height="50">
+        <DockPanel DockPanel.Dock="Top" Background="{DynamicResource ControlBackgroundBrush}" Height="50" HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="10">
                 <TextBlock Text="Name: " FontWeight="Bold" Foreground="{DynamicResource ForegroundBrush}"/>
                 <TextBlock Text="{Binding LoggedInUserName}" Margin="5,0" Foreground="{DynamicResource ForegroundBrush}"/>
                 <TextBlock Text="Email: " FontWeight="Bold" Margin="20,0,0,0" Foreground="{DynamicResource ForegroundBrush}"/>
                 <TextBlock Text="{Binding LoggedInUserEmail}" Margin="5,0" Foreground="{DynamicResource ForegroundBrush}"/>
             </StackPanel>
-            <Button Content="🌙/☀"
-                    Command="{Binding ToggleThemeCommand}"
-                    Background="Transparent"
-                    Foreground="{DynamicResource ForegroundBrush}"
-                    Width="40" Height="30" Margin="10" HorizontalAlignment="Right"/>
+
+            <Button Content="🚪 Logout"
+        Width="80"
+        Height="30"
+        Margin="10,0,10,0"
+        VerticalAlignment="Center"
+        Command="{Binding LogoutCommand}"
+        Background="{DynamicResource AccentBrush}"
+        Foreground="{DynamicResource ForegroundBrush}" />
+
+
         </DockPanel>
 
         <!-- Content -->

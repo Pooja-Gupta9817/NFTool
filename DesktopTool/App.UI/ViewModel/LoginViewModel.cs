@@ -144,6 +144,7 @@ namespace DesktopTool.App.UI.ViewModel
                         userContext.Email = user.Email;
                         userContext.Name = user.Name;
                         userContext.Role = user.Role;
+                        //userContext.
 
                         _roleWindowService.GetDashboardForRole(user.Role);
                         CloseAction?.Invoke();

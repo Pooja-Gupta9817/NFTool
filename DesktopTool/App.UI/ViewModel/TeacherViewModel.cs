@@ -1,5 +1,6 @@
 ﻿using App.UI.ViewModel;
 using DesktopTool.App.Core.Interfaces;
+using DesktopTool.App.Service;
 using DesktopTool.App.UI.Helper;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -9,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -17,19 +19,25 @@ namespace DesktopTool.App.UI.ViewModel
     public class TeacherViewModel : INotifyPropertyChanged
     {
         private readonly IServiceProvider _serviceProvider;
+        private readonly ILogoutService _logoutService;
         public string LoggedInUserName { get; }
         public string LoggedInUserEmail { get; }
 
+        public ICommand LogoutCommand { get; }
 
-        public TeacherViewModel(IServiceProvider serviceProvider, IUserContext userContext)
+
+        public TeacherViewModel(IServiceProvider serviceProvider, IUserContext userContext,ILogoutService logoutService)
         {
             _serviceProvider = serviceProvider;
             LoggedInUserName = userContext.Name;     // E.g., "Payal"
             LoggedInUserEmail = userContext.Email;
+            _logoutService = logoutService;
 
             OpenUploadPdfCommand = new RelayCommand(OpenUploadPdf);
             OpenUploadMarksCommand = new RelayCommand(OpenUploadMarks);
             OpenStudentListCommand = new RelayCommand(OpenStudentList);
+
+            LogoutCommand = new RelayCommand(Logout); LogoutCommand = new RelayCommand(Logout);
         }
 
         private object _currentViewModel;
@@ -59,6 +67,16 @@ namespace DesktopTool.App.UI.ViewModel
         public event PropertyChangedEventHandler PropertyChanged;
         protected void OnPropertyChanged(string name) =>
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+
+        private void Logout()
+        {
+            var result = MessageBox.Show("Are you sure you want to logout?", "Confirm Logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.Yes)
+            {
+                _logoutService.LogoutAndShowLogin();
+            }
+        }
+
     }
 
 }

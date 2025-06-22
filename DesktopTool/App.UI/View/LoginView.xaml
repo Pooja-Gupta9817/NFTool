@@ -76,7 +76,6 @@
                         Command="{Binding SubmitCommand}"
                         Margin="0,20,0,0"
                         Height="40"
-                        Background="{DynamicResource AccentBrush}"
                         Foreground="{DynamicResource ForegroundBrush}"
                         FontWeight="Bold"
                         BorderBrush="{DynamicResource ControlBorderBrush}"

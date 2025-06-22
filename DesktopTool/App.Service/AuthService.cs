@@ -84,7 +84,7 @@ namespace DesktopTool.App.Service
 
             var responseContent = await response.Content.ReadAsStringAsync();
             var result = JsonSerializer.Deserialize<LoginUserDto>(responseContent);
-
+            _jwtToken = result.Token; // store token
             return (true, result.Token, result.User);
         }
 

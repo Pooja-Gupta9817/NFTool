@@ -26,6 +26,8 @@ namespace DesktopTool
                 })
                 .Build();
 
+            Application.Current.ShutdownMode = ShutdownMode.OnExplicitShutdown;
+
             // Manually launch the first view
             var loginView = _host.Services.GetRequiredService<LoginView>();
             loginView.Show();

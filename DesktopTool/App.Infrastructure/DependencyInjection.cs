@@ -67,6 +67,8 @@ namespace DesktopTool.App.Infrastructure
             services.AddSingleton<IRoleBasedDashboardService, RoleBasedDashboardService>();
             services.AddSingleton<IUploadedFileRepository, UploadedFileRepository>();
             services.AddSingleton<IUserContext, UserContext>();
+            services.AddSingleton<ILogoutService, LogoutService>();
+
 
 
             return services;
