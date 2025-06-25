@@ -6,7 +6,6 @@ using DesktopTool.App.Infrastructure.Repository;
 using DesktopTool.App.Service;
 using DesktopTool.App.UI.View;
 using DesktopTool.App.UI.ViewModel;
-using DesktopTool.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -68,9 +67,7 @@ namespace DesktopTool.App.Infrastructure
             services.AddSingleton<IRoleBasedDashboardService, RoleBasedDashboardService>();
             services.AddSingleton<IUploadedFileRepository, UploadedFileRepository>();
             services.AddSingleton<IUserContext, UserContext>();
-            services.AddSingleton<ILogoutService, LogoutService>();
 
-            services.AddSingleton<SignalRClient>();
 
             return services;
 

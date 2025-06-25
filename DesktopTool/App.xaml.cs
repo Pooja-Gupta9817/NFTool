@@ -1,11 +1,11 @@
-﻿using DesktopTool.App.UI.View;
-
+﻿using DesktopTool.App.Infrastructure;
+using DesktopTool.App.UI.View;
+using DesktopTool.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Configuration;
 using System.Data;
 using System.Windows;
-using DesktopTool.App.Infrastructure;
 
 namespace DesktopTool
 {
@@ -32,8 +32,25 @@ namespace DesktopTool
             var loginView = _host.Services.GetRequiredService<LoginView>();
             loginView.Show();
 
+
+            //  Resolve SignalRClient from DI and start
+            var signalRClient = _host.Services.GetRequiredService<SignalRClient>();
+            _ = signalRClient.StartAsync(); // fire-and-forget
             base.OnStartup(e);
         }
+
+        protected override void OnExit(ExitEventArgs e)
+        {
+            // Stop SignalR connection and dispose
+            var signalRClient = _host.Services.GetRequiredService<SignalRClient>();
+            signalRClient.StopAsync().Wait(); // optional, clean shutdown
+            signalRClient.Dispose();
+
+            _host.Dispose(); // dispose of the host too
+
+            base.OnExit(e);
+        }
+
 
     }
 }

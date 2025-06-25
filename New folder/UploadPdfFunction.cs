@@ -28,17 +28,15 @@ namespace DesktopTool.AzureFunctions.Functions
         private readonly string _connectionString;
         private readonly string _containerName;
         private readonly IUploadedFileRepository _uploadedFileRepository;
-        private readonly ISignalRNotifier _notifier;
 
-        public UploadPdfFunction(BlobServiceClient blobServiceClient, ILogger<UploadPdfFunction> logger, IConfiguration config , 
-            IUploadedFileRepository uploadedFileRepository , ISignalRNotifier notifier)
+
+        public UploadPdfFunction(BlobServiceClient blobServiceClient, ILogger<UploadPdfFunction> logger, IConfiguration config , IUploadedFileRepository uploadedFileRepository)
         {
             _blobServiceClient = blobServiceClient;
             _logger = logger;
             _connectionString = config["SqlConnectionString"] ?? throw new ArgumentNullException("SqlConnectionString");
             _containerName = config["BlobContainerName"] ?? "pdfuploads";
             _uploadedFileRepository = uploadedFileRepository;
-            _notifier = notifier;
         }
 
         [Function("UploadPdf")]
@@ -88,9 +86,6 @@ namespace DesktopTool.AzureFunctions.Functions
 
                 var ok = req.CreateResponse(HttpStatusCode.OK);
                 await ok.WriteStringAsync($"File uploaded: {uniqueFileName}");
-
-                // ✅ Add this line temporarily
-                await _notifier.NotifyFileUploadedAsync("📢 Manual Test File");
                 return ok;
             }
             catch (Exception ex)
