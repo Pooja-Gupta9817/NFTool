@@ -90,7 +90,7 @@ namespace DesktopTool.AzureFunctions.Functions
                 await ok.WriteStringAsync($"File uploaded: {uniqueFileName}");
 
                 // ✅ Add this line temporarily
-                await _notifier.NotifyFileUploadedAsync("📢 Manual Test File");
+                //await _notifier.NotifyFileUploadedAsync("📢 Manual Test File");
                 return ok;
             }
             catch (Exception ex)

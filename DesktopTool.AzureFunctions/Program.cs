@@ -21,7 +21,9 @@ Console.WriteLine($"🔧 Current Environment: {builder.Environment.EnvironmentNa
 // ✅ Register SignalR Notifier
 if (builder.Environment.IsDevelopment())
 {
-    builder.Services.AddSingleton<ISignalRNotifier, FakeSignalRNotifier>();
+     builder.Services.AddSingleton<ISignalRNotifier, FakeSignalRNotifier>();
+    //builder.Services.AddSingleton<ISignalRNotifier, RealSignalRNotifier>();
+
 }
 else
 {

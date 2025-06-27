@@ -21,3 +21,15 @@ TestResults/
 
 # Ignore local configuration
 launchSettings.json
+
+# Ignore Azure Function local settings
+local.settings.json
+
+# Ignore environment & secret files
+.env
+*.secret
+*.key
+
+# Ignore template output files
+*.template.json
+

@@ -32,7 +32,7 @@ namespace DesktopTool.SignalR
             });
 
             await _connection.StartAsync();
-            File.AppendAllText("signalr.log", $"[{DateTime.Now}] ✅ SignalR Connected.{Environment.NewLine}");
+            //File.AppendAllText("signalr.log", $"[{DateTime.Now}] ✅ SignalR Connected.{Environment.NewLine}");
         }
 
         public async Task StopAsync()

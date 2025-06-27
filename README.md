@@ -10,6 +10,9 @@
 
 ---
 
+📌 [View Feature Tracker & Roadmap](https://github.com/users/Pooja-Gupta9817/projects/2/views/1)  
+
+
 ## ✨ Features 
 
 - ✅ **User Authentication** via Azure Functions (Login/Register)
@@ -43,19 +46,20 @@
 
 ## 📊 Planned Enhancements
 
-### ✅ Add Dashboard Analytics
-- Show uploaded files count
-- Display student activity (role-wise stats)
+| 📊 WPF Dashboard with Charts | Adds a visual analytics layer using LiveCharts or Syncfusion |
+| 🔐 Secure Refresh Token Flow | Implements token renewal and session management for production-readiness |
+| ⏱️ Background Jobs via Azure Queue Trigger | Offloads heavy/long-running operations asynchronously |
+| ⚡ Durable Function Orchestration | Demonstrates fan-out/fan-in patterns and resilient workflow design |
+| 🧾 Optional Cosmos DB Logging | Explore structured logging using NoSQL (local emulator or cloud) |
 
-### 🚀 Real-Time Notifications with SignalR
+### 🚀 Real-Time Notifications with SignalR (Simulated)
 
-**Flow Summary**(Planned):
+**Flow Summary** (Implemented via `FakeSignalRNotifier`):
 
-1. 📤 User uploads a file to Azure Blob Storage  (Already done)
-2. 🔔 **Azure Event Grid** detects the blob upload  
-3. ⚡ Event triggers an **Azure Function**  
-4. 📡 Function sends message via **Azure SignalR Service**  
-5. 🖥️ WPF client (SignalR Hub) receives event → UI auto-updates in real-time  
+1. 📤 User uploads a file to Azure Blob Storage  
+2. ⚡ Azure Function (BlobTrigger) processes the event  
+3. ✏️ Function logs notification to a local file (`signalr.log`)  
+4. 🖥️ WPF client watches log file and shows real-time toast notification  
 
 ---
 
@@ -94,5 +98,13 @@
 - Add `SqlConnectionString` and `AzureSignalRConnectionString` in `local.settings.json`
 - Start the WPF app and test upload/login flows
 
+
+### 📱 Future Roadmap
+
+🔄 **Planned Migration to .NET MAUI**  
+After all functionality is implemented and tested in WPF, the solution will be **migrated to a .NET MAUI app** for cross-platform deployment (Windows + Android). This will:
+- Showcase mobile + desktop dev skills
+- Allow native app notifications
+- Reuse backend logic via shared service layer
 ---
 

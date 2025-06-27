@@ -12,6 +12,7 @@ namespace DesktopTool.AzureFunctions.Notification;
 public class FakeSignalRNotifier : ISignalRNotifier
 {
     private readonly ILogger<FakeSignalRNotifier> _logger;
+    private static readonly object _fileLock = new();
     public FakeSignalRNotifier(ILogger<FakeSignalRNotifier> logger)
     {
         _logger = logger;
@@ -19,9 +20,14 @@ public class FakeSignalRNotifier : ISignalRNotifier
 
     public Task NotifyFileUploadedAsync(string fileUrl)
     {
-        var message = $"Simulated upload: {fileUrl}";
-        File.AppendAllText("signalr.log", $"[{DateTime.Now}] FakeNotifier sending: {message}{Environment.NewLine}");
-        _logger.LogInformation($"[FakeNotifier] Simulated notification: {fileUrl}");
+        var message = $"[{DateTime.Now}] FakeNotifier: {fileUrl}{Environment.NewLine}";
+
+        lock (_fileLock) //  Prevents multiple threads writing at once
+        {
+            File.AppendAllText("signalr.log", message);
+        }
+
+        _logger.LogInformation($"[FakeNotifier] Simulated: {fileUrl}");
         return Task.CompletedTask;
     }
 }
