@@ -30,6 +30,9 @@ local.settings.json
 *.secret
 *.key
 
-# Ignore template output files
-*.template.json
+# Azurite local emulator storage
+__azurite_db_*.json
+__blobstorage__/
+__queuestorage__/
+
 
