@@ -21,6 +21,17 @@
             <DataTemplate DataType="{x:Type vm:StudentListViewModel}">
                 <views:StudentListView />
             </DataTemplate>
+
+            <DataTemplate DataType="{x:Type vm:StudentDashboardViewModel}">
+                <views:StudentDashboardView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:MyFilesViewModel}">
+                <views:MyFilesView />
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type vm:StudentStatsViewModel}">
+                <views:StudentStatsView />
+            </DataTemplate>
+            
         </ResourceDictionary>
     </Application.Resources>
 </Application>

@@ -37,6 +37,9 @@ namespace DesktopTool.App.Infrastructure
             services.AddTransient<UploadPdfViewModel>();
             services.AddTransient<UploadMarksViewModel>();
             services.AddTransient<StudentListViewModel>();
+            services.AddTransient<StudentDashboardViewModel>();
+            services.AddTransient<MyFilesViewModel>();
+            services.AddTransient<StudentStatsViewModel>();
 
             // Register Views
             services.AddTransient<LoginView>();
@@ -64,6 +67,9 @@ namespace DesktopTool.App.Infrastructure
             services.AddSingleton<UploadPdfView>();
             services.AddSingleton<UploadMarksView>();
             services.AddSingleton<StudentListView>();
+            services.AddSingleton<StudentDashboardView>();
+            services.AddSingleton<MyFilesView>();
+            services.AddSingleton<StudentStatsView>();
 
             services.AddSingleton<IRoleBasedDashboardService, RoleBasedDashboardService>();
             services.AddSingleton<IUploadedFileRepository, UploadedFileRepository>();
