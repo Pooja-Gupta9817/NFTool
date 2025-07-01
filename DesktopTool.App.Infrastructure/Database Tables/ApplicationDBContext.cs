@@ -1,4 +1,5 @@
 ﻿
+
 using DesktopTool.App.Core.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -16,6 +17,7 @@ namespace DesktopTool.App.Infrastructure
 
         public DbSet<User> Users => Set<User>();// Table name
         public DbSet<UploadedFiles> UploadedFiles { get; set; }
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
 
 
         // Optional: for manual configuration

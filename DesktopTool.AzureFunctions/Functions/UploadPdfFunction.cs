@@ -42,14 +42,40 @@ namespace DesktopTool.AzureFunctions.Functions
         }
 
         [Function("UploadPdf")]
+ 
         public async Task<HttpResponseData> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "UploadPdf")] HttpRequestData req)
+    [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "UploadPdf")] HttpRequestData req,
+    ClaimsPrincipal principal)
         {
             try
             {
+                var token = req.Headers.FirstOrDefault(h => h.Key == "Authorization").Value?.FirstOrDefault();
+
+
+                if (string.IsNullOrWhiteSpace(token) || !token.StartsWith("Bearer "))
+                    return await Unauthorized(req, "Missing or invalid token.");
+
+                token = token.Substring("Bearer ".Length);
+
+                var handler = new JwtSecurityTokenHandler();
+                var jwt = handler.ReadJwtToken(token);
+
+                var exp = jwt.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+                _logger.LogInformation("exp: {exp}");
+
+                var expiry = DateTimeOffset.FromUnixTimeSeconds(long.Parse(exp)).UtcDateTime;
+                if (expiry < DateTime.UtcNow)
+                {
+                    _logger.LogWarning("🚫 Token expired.");
+                    return await Unauthorized(req, "Token expired.");
+                }
+
+               
+                if (exp == null || DateTimeOffset.FromUnixTimeSeconds(long.Parse(exp)) < DateTimeOffset.UtcNow)
+                    return await Unauthorized(req, "Token expired.");
+
                 _logger.LogInformation("Starting upload");
-                string? jwt = req.Headers.GetValues("Authorization").FirstOrDefault()?.Replace("Bearer ", "");
-                _logger.LogInformation($"JWT raw: {jwt}");
+
                 string username = ExtractUsernameFromJwt(jwt);
 
 
@@ -102,6 +128,13 @@ namespace DesktopTool.AzureFunctions.Functions
             }
         }
 
+        private async Task<HttpResponseData> Unauthorized(HttpRequestData req, string message)
+        {
+            var response = req.CreateResponse(System.Net.HttpStatusCode.Unauthorized);
+            await response.WriteStringAsync(message);
+            return response;
+        }
+
         private string GetFileNameFromContentDisposition(MultipartSection section)
         {
             var contentDisposition = section.ContentDisposition;
@@ -115,40 +148,25 @@ namespace DesktopTool.AzureFunctions.Functions
             return string.Empty;
         }
 
-        private string ExtractUsernameFromJwt(string? jwt)
+        private string ExtractUsernameFromJwt(JwtSecurityToken token)
         {
-            if (string.IsNullOrWhiteSpace(jwt))
-            {
-                _logger.LogWarning("JWT is null or empty.");
-                return "anonymous";
-            }
-
-            var handler = new JwtSecurityTokenHandler();
-
-            if (!handler.CanReadToken(jwt))
-            {
-                _logger.LogWarning("JWT format is invalid.");
-                return "anonymous";
-            }
-
             try
             {
-                var token = handler.ReadJwtToken(jwt);
                 foreach (var claim in token.Claims)
                 {
                     _logger.LogInformation($"Claim: {claim.Type} = {claim.Value}");
                 }
-                return  token.Claims.FirstOrDefault(c =>
-    c.Type == "name" || c.Type == ClaimTypes.Name)?.Value ?? "anonymous";
 
-
+                return token.Claims.FirstOrDefault(c =>
+                    c.Type == "name" || c.Type == ClaimTypes.Name)?.Value ?? "anonymous";
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "JWT parsing failed.");
+                _logger.LogError(ex, "Failed to extract username from JWT.");
                 return "anonymous";
             }
         }
+
 
 
         private async Task LogMetadataToSqlAsync(string fileName, long size, string username)

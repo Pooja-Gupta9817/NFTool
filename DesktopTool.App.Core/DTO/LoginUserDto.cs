@@ -8,7 +8,8 @@ namespace DesktopTool.App.Core
 {
     public class LoginUserDto
     {
-        public string Token { get; set; }
+        public string Token { get; set; }           // Access token
+        public string RefreshToken { get; set; }    // Refresh token
         public UserInfoDto User { get; set; }
     }
     public class LoginDto

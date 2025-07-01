@@ -4,13 +4,38 @@ using DesktopTool.App.Core.Models;
 using DesktopTool.App.Infrastructure.Repository;
 using DesktopTool.App.Infrastructure.Service;
 using DesktopTool.AzureFunctions.Notification;
+using DesktopTool.AzureFunctions.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = FunctionsApplication.CreateBuilder(args);
+//builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+//    .AddJwtBearer(options =>
+//    {
+//        options.TokenValidationParameters = new TokenValidationParameters
+//        {
+//            ValidateIssuer = true,
+//            ValidIssuer = "DesktopTool",
+
+//            ValidateAudience = true,
+//            ValidAudience = "DesktopToolClient",
+
+//            ValidateLifetime = true,
+//            ClockSkew = TimeSpan.Zero, // Very strict
+
+//            ValidateIssuerSigningKey = true,
+//            IssuerSigningKey = new SymmetricSecurityKey(
+//                Encoding.UTF8.GetBytes("ThisIsASecretKeyForJwtToken!ChangeIt"))
+//        };
+//    });
+
+//builder.Services.AddAuthorization();
 
 // ✅ Configure Kestrel (for large file uploads)
 builder.Services.Configure<KestrelServerOptions>(options =>
@@ -36,6 +61,7 @@ var connectionString = "Server=localhost;Database=StudentToolDb;Trusted_Connecti
 builder.Services.AddInfrastructure(connectionString);
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUploadedFileRepository, UploadedFileRepository>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 builder.Services.AddSingleton(sp =>
 {
