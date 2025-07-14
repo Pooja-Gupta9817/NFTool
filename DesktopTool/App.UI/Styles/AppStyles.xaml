@@ -3,7 +3,7 @@
 
 
 
-    <Style x:Key="NavButton" TargetType="Button">
+    <!--<Style x:Key="NavButton" TargetType="Button">
         <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}"/>
         <Setter Property="Background" Value="Blue"/>
         <Setter Property="BorderBrush" Value="Transparent"/>
@@ -26,8 +26,51 @@
                 <Setter Property="Background" Value="#8D99AE"/>
             </Trigger>
         </Style.Triggers>
+    </Style>-->
+
+    <Style x:Key="SidebarButtonStyle" TargetType="Button">
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="FontSize" Value="14"/>
+        <Setter Property="Margin" Value="10,5"/>
+        <Setter Property="Padding" Value="10 5"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}" CornerRadius="5">
+                        <ContentPresenter Margin="10,0" VerticalAlignment="Center"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+
     </Style>
 
-    
-    
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="White"/>
+        <Setter Property="CornerRadius" Value="10"/>
+        <Setter Property="Padding" Value="15"/>
+        <Setter Property="Margin" Value="10"/>
+        <Setter Property="BorderBrush" Value="#DDD"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="8" ShadowDepth="2" Color="Gray" Opacity="0.3"/>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style x:Key="CardHeaderText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="18"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Margin" Value="0,0,0,10"/>
+    </Style>
+
+    <Style x:Key="CardSubText" TargetType="TextBlock">
+        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="Foreground" Value="Gray"/>
+    </Style>
+
 </ResourceDictionary>

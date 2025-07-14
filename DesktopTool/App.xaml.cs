@@ -1,6 +1,7 @@
 ﻿using DesktopTool.App.Infrastructure;
 using DesktopTool.App.UI.View;
 using DesktopTool.SignalR;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Configuration;
@@ -19,13 +20,18 @@ namespace DesktopTool
         private string connectionString = "";
         private FileSystemWatcher _logWatcher;
         private string _logPath;
+        public static IConfiguration Configuration { get; private set; }
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            var configuration = new ConfigurationBuilder()
+    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+    .AddJsonFile("appsettings.json")
+    .Build();
             _host = Host.CreateDefaultBuilder()
                 .ConfigureServices(services =>
                 {
-                    services.AddInfrastructure(connectionString); // ✅ Centralized DI call
+                    services.AddInfrastructure(configuration, connectionString);// ✅ Centralized DI call
                 })
                 .Build();
 
@@ -40,6 +46,12 @@ namespace DesktopTool
             var signalRClient = _host.Services.GetRequiredService<SignalRClient>();
             _ = signalRClient.StartAsync(); // fire-and-forget
             WatchSignalRLog();
+
+            var builder = new ConfigurationBuilder()
+           .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+           .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+
+            Configuration = builder.Build();
             base.OnStartup(e);
         }
 

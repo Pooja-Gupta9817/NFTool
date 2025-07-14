@@ -8,6 +8,7 @@ using DesktopTool.App.UI.View;
 using DesktopTool.App.UI.ViewModel;
 using DesktopTool.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -20,10 +21,10 @@ namespace DesktopTool.App.Infrastructure
 {
     public static class DependencyInjection
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services, string connectionString)
+        public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration, string connectionString)
         {
             connectionString = "Server=localhost;Database=StudentToolDb;Trusted_Connection=True;TrustServerCertificate=True;";
-           
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(connectionString)); // This connects to Azure SQL
 
@@ -75,6 +76,13 @@ namespace DesktopTool.App.Infrastructure
             services.AddSingleton<IUploadedFileRepository, UploadedFileRepository>();
             services.AddSingleton<IUserContext, UserContext>();
             services.AddSingleton<ILogoutService, LogoutService>();
+
+            services.AddHttpClient<IAIAssistantService, OpenAIAssistantService>(client =>
+            {
+                client.BaseAddress = new Uri("https://openrouter.ai/api/v1/");
+                client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", configuration["OpenAI:ApiKey"]);
+                client.DefaultRequestHeaders.Add("User-Agent", "DesktopTool");
+            });
 
             services.AddSingleton<SignalRClient>();
 

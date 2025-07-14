@@ -25,6 +25,8 @@ namespace DesktopTool.App.UI.ViewModel
         public ICommand OpenDashboardCommand { get; }
         public ICommand OpenMyFilesCommand { get; }
         public ICommand OpenMyStatsCommand { get; }
+        public ICommand OpenStudyPlanCommand { get; }
+        public ICommand OpenAIAssistantCommand { get; }
 
         public StudentViewModel(IServiceProvider serviceProvider, IUserContext userContext, ILogoutService logoutService)
         {
@@ -37,9 +39,21 @@ namespace DesktopTool.App.UI.ViewModel
             OpenDashboardCommand = new RelayCommand(OpenDashboard);
             OpenMyFilesCommand = new RelayCommand(OpenMyFiles);
             OpenMyStatsCommand = new RelayCommand(OpenMyStats);
+            OpenStudyPlanCommand = new RelayCommand(OpenStudyPlan);
+            OpenAIAssistantCommand = new RelayCommand(OpenAIAssistant);
             LogoutCommand = new RelayCommand(Logout);
 
             OpenDashboard(); // default view
+        }
+
+        private void OpenAIAssistant()
+        {
+           
+        }
+
+        private void OpenStudyPlan()
+        {
+           
         }
 
         private object _currentViewModel;

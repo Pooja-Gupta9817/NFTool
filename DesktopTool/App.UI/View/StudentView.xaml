@@ -10,9 +10,12 @@
         <!-- Sidebar -->
         <StackPanel Background="DarkSlateBlue" Width="180" DockPanel.Dock="Left">
             <TextBlock Text="Student Panel" Foreground="White" FontWeight="Bold" FontSize="16" Margin="0 10"/>
-            <Button Content="📊 Dashboard" Command="{Binding OpenDashboardCommand}" />
-            <Button Content="📁 My Files" Command="{Binding OpenMyFilesCommand}" />
-            <Button Content="🧾 My Stats" Command="{Binding OpenMyStatsCommand}" />
+            <Button Content="📊 Dashboard" Command="{Binding OpenDashboardCommand}"  Style="{StaticResource SidebarButtonStyle}" />
+            <Button Content="📁 My Files" Command="{Binding OpenMyFilesCommand}" Style="{StaticResource SidebarButtonStyle}" />
+            <Button Content="📈 My Stats" Command="{Binding OpenMyStatsCommand}" Style="{StaticResource SidebarButtonStyle}" />
+            <Button Content="🧠 Study Plan" Command="{Binding OpenStudyPlanCommand}" Style="{StaticResource SidebarButtonStyle}" />
+            <Button Content="🤖 AI Assistant" Command="{Binding OpenAIAssistantCommand}" Style="{StaticResource SidebarButtonStyle}" />
+
         </StackPanel>
 
         <!-- TopBar -->
